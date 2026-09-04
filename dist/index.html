@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Estruturas para Minecraft em arquivos unificados Holoprint e MCStructure, com download direto."
+    />
+    <meta name="theme-color" content="#050506" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+    />
+    <title>Guizz Structures — Estruturas para Minecraft</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Oxanium:wght@500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="noise" aria-hidden="true"></div>
+
+    <aside class="sidebar" aria-label="Navegacao principal">
+      <a class="brand" href="#/home" aria-label="Guizz Structures — Inicio">
+        <span class="brand-mark" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </span>
+        <span class="brand-copy">
+          <strong>GUIZZ</strong>
+          <small>STRUCTURES</small>
+        </span>
+      </a>
+
+      <nav class="side-nav" id="desktop-nav">
+        <a class="nav-item" href="#/home" data-route="home">
+          <i data-lucide="layout-grid"></i><span data-i18n="nav.home">Catalogo</span>
+        </a>
+        <a class="nav-item" href="#/favorites" data-route="favorites">
+          <i data-lucide="heart"></i><span data-i18n="nav.favorites">Meus favoritos</span>
+        </a>
+        <a class="nav-item" href="#/profile" data-route="profile">
+          <i data-lucide="user-round"></i><span data-i18n="nav.profile">Perfil</span>
+        </a>
+        <a class="nav-item admin-nav is-hidden" href="#/admin" data-route="admin">
+          <i data-lucide="shield-check"></i><span data-i18n="nav.admin">Painel admin</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-foot">
+        <div class="status-chip">
+          <span class="status-dot"></span>
+          <span data-i18n="common.direct">Download direto</span>
+        </div>
+        <p>Java &amp; Bedrock</p>
+      </div>
+    </aside>
+
+    <header class="topbar">
+      <a class="mobile-brand" href="#/home" aria-label="Guizz Structures">
+        <span class="brand-mark brand-mark-small" aria-hidden="true"><span></span><span></span><span></span></span>
+        <strong>GUIZZ</strong>
+      </a>
+
+      <label class="global-search" for="search-input">
+        <i data-lucide="search"></i>
+        <input
+          id="search-input"
+          type="search"
+          autocomplete="off"
+          data-i18n-placeholder="search.placeholder"
+          placeholder="Buscar estruturas..."
+        />
+        <kbd>/</kbd>
+      </label>
+
+      <div class="topbar-actions">
+        <label class="language-control" for="language-select">
+          <i data-lucide="languages"></i>
+          <span class="sr-only" data-i18n="language.label">Idioma</span>
+          <select id="language-select" aria-label="Idioma">
+            <option value="pt-BR">PT</option>
+            <option value="en">EN</option>
+            <option value="es">ES</option>
+          </select>
+        </label>
+        <button class="account-button" id="account-button" type="button">
+          <i data-lucide="log-in"></i>
+          <span data-i18n="auth.signIn">Entrar</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="main-shell" id="app" tabindex="-1"></main>
+
+    <nav class="mobile-nav" id="mobile-nav" aria-label="Navegacao mobile">
+      <a href="#/home" data-route="home"><i data-lucide="layout-grid"></i><span data-i18n="nav.homeShort">Catalogo</span></a>
+      <a href="#/favorites" data-route="favorites"><i data-lucide="heart"></i><span data-i18n="nav.favoritesShort">Favoritos</span></a>
+      <a href="#/profile" data-route="profile"><i data-lucide="user-round"></i><span data-i18n="nav.profile">Perfil</span></a>
+      <a class="admin-nav is-hidden" href="#/admin" data-route="admin"><i data-lucide="shield-check"></i><span>Admin</span></a>
+    </nav>
+
+    <dialog class="auth-dialog" id="auth-dialog">
+      <div class="dialog-glow" aria-hidden="true"></div>
+      <button class="icon-button dialog-close" type="button" data-close-dialog aria-label="Fechar">
+        <i data-lucide="x"></i>
+      </button>
+      <div class="auth-heading">
+        <span class="eyebrow" data-i18n="auth.eyebrow">Sua biblioteca</span>
+        <h2 data-i18n="auth.title">Entre para salvar estruturas</h2>
+        <p data-i18n="auth.subtitle">Sincronize favoritos e acompanhe seus downloads.</p>
+      </div>
+      <div class="auth-tabs" role="tablist" aria-label="Acesso">
+        <button class="active" type="button" role="tab" data-auth-tab="login" data-i18n="auth.loginTab">Entrar</button>
+        <button type="button" role="tab" data-auth-tab="signup" data-i18n="auth.signupTab">Criar conta</button>
+      </div>
+      <form id="auth-form" class="auth-form">
+        <label class="field signup-only is-hidden">
+          <span data-i18n="auth.name">Seu nome</span>
+          <input id="auth-name" name="name" type="text" autocomplete="name" maxlength="60" />
+        </label>
+        <label class="field">
+          <span data-i18n="auth.email">E-mail</span>
+          <input id="auth-email" name="email" type="email" autocomplete="email" required />
+        </label>
+        <label class="field">
+          <span data-i18n="auth.password">Senha</span>
+          <input id="auth-password" name="password" type="password" autocomplete="current-password" minlength="6" required />
+        </label>
+        <button class="primary-button auth-submit" type="submit">
+          <span data-i18n="auth.signIn">Entrar</span><i data-lucide="arrow-right"></i>
+        </button>
+      </form>
+      <p class="auth-feedback" id="auth-feedback" role="status"></p>
+    </dialog>
+
+    <dialog class="confirm-dialog" id="confirm-dialog">
+      <div class="confirm-icon"><i data-lucide="trash-2"></i></div>
+      <h2 data-i18n="admin.deleteTitle">Excluir estrutura?</h2>
+      <p data-i18n="admin.deleteText">Essa acao remove o item do catalogo e nao pode ser desfeita.</p>
+      <div class="dialog-actions">
+        <button class="secondary-button" type="button" data-cancel-delete data-i18n="common.cancel">Cancelar</button>
+        <button class="danger-button" type="button" data-confirm-delete data-i18n="common.delete">Excluir</button>
+      </div>
+    </dialog>
+
+    <div class="toast-stack" id="toast-stack" aria-live="polite" aria-atomic="true"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
+    <script src="./config.js" defer></script>
+    <script src="./app.js" defer></script>
+  </body>
+</html>
