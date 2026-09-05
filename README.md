@@ -39,11 +39,11 @@ where id = (
 
 A senha nao aparece em nenhum arquivo do frontend. Contas criadas pelo cadastro recebem sempre `role = 'user'`. Mesmo que alguem tente abrir `#/admin` manualmente ou alterar o frontend, as politicas RLS impedem escrita em `items` e no Storage sem a role e o e-mail corretos.
 
-## 3. Conectar URL e Anon Key
+## 3. Conexao Supabase
 
-1. No Supabase, abra **Project Settings > API**.
-2. Copie a **Project URL** e a chave publica **anon / publishable**.
-3. Edite `dist/config.js`:
+O projeto Supabase ja esta conectado em `dist/config.js` com a Project URL e a chave publica `anon / publishable` fornecidas pelo proprietario.
+
+Se o projeto Supabase for trocado no futuro, edite:
 
 ```js
 window.__APP_CONFIG__ = {
