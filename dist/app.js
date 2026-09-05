@@ -7,391 +7,6 @@
     Boolean(config.SUPABASE_ANON_KEY) &&
     !String(config.SUPABASE_ANON_KEY).includes("SUA_SUPABASE");
 
-  const translations = {
-    "pt-BR": {
-      nav: {
-        home: "Catalogo",
-        homeShort: "Catalogo",
-        favorites: "Meus favoritos",
-        favoritesShort: "Favoritos",
-        profile: "Perfil",
-        admin: "Painel admin",
-      },
-      common: {
-        direct: "Download direto",
-        cancel: "Cancelar",
-        delete: "Excluir",
-        all: "Todas",
-        loading: "Carregando...",
-        signOut: "Sair da conta",
-        tryAgain: "Tentar novamente",
-      },
-      language: { label: "Idioma" },
-      search: { placeholder: "Buscar estruturas..." },
-      hero: {
-        eyebrow: "Blueprints sem limites",
-        title: "Construa grande. <span>Baixe agora.</span>",
-        subtitle:
-          "Estruturas selecionadas para Minecraft em pacotes unificados, prontos para download imediato.",
-        badge: "Arquivo unificado",
-        demo:
-          "Modo demonstracao: conecte o Supabase em config.js para carregar seu catalogo real.",
-      },
-      catalog: {
-        title: "Estruturas em destaque",
-        result: "{count} estruturas prontas para construir",
-        emptyTitle: "Nenhuma estrutura encontrada",
-        emptyText: "Tente outro termo ou limpe o filtro atual.",
-        clear: "Limpar busca",
-        noItemsTitle: "Seu catalogo esta pronto para receber estruturas",
-        noItemsText: "Acesse o painel admin e publique o primeiro arquivo unificado.",
-      },
-      card: {
-        description: "Pacote unificado completo, pronto para baixar e construir.",
-        favorite: "Adicionar aos favoritos",
-        unfavorite: "Remover dos favoritos",
-        download: "Baixar pacote unificado",
-      },
-      favorites: {
-        eyebrow: "Sua colecao",
-        title: "Meus favoritos",
-        subtitle: "As estruturas que voce salvou ficam reunidas aqui.",
-        count: "{count} salvos",
-        emptyTitle: "Nenhum favorito por enquanto",
-        emptyText: "Toque no coracao de uma estrutura para guardar aqui.",
-        explore: "Explorar catalogo",
-      },
-      profile: {
-        eyebrow: "Sua atividade",
-        title: "Perfil",
-        subtitle: "Favoritos e downloads recentes sincronizados com sua conta.",
-        member: "Membro",
-        admin: "Administrador",
-        favorites: "Favoritos",
-        downloads: "Downloads",
-        recentDownloads: "Downloads recentes",
-        recentFavorites: "Favoritos recentes",
-        viewAll: "Ver todos",
-        noDownloads: "Seus downloads recentes aparecerao aqui.",
-        noFavorites: "Seus favoritos recentes aparecerao aqui.",
-        downloadedAs: "Pacote unificado baixado",
-        saved: "Estrutura salva",
-      },
-      auth: {
-        eyebrow: "Sua biblioteca",
-        title: "Entre para salvar estruturas",
-        subtitle: "Sincronize favoritos e acompanhe seus downloads.",
-        loginTab: "Entrar",
-        signupTab: "Criar conta",
-        name: "Seu nome",
-        email: "E-mail",
-        password: "Senha",
-        signIn: "Entrar",
-        signUp: "Criar minha conta",
-        account: "Minha conta",
-        confirmEmail: "Conta criada. Confira seu e-mail para confirmar o acesso.",
-        welcome: "Acesso liberado. Bem-vindo!",
-        configNeeded: "Conecte o Supabase antes de usar contas.",
-      },
-      admin: {
-        eyebrow: "Gestao do catalogo",
-        title: "Painel administrativo",
-        subtitle: "Publique cada estrutura com um unico pacote para download direto.",
-        formTitle: "Nova estrutura",
-        editTitle: "Editar estrutura",
-        formText: "Tres campos. Um arquivo. Dois botoes de download.",
-        name: "Nome da estrutura",
-        namePlaceholder: "Ex.: Castelo da Montanha",
-        category: "Categoria",
-        thumbnail: "Imagem / thumbnail",
-        thumbnailHelp: "JPG, PNG ou WebP com ate 5 MB.",
-        downloadUrl: "Link unico de download",
-        downloadPlaceholder: "https://...",
-        downloadHelp: "O botao do card abre exatamente este link, sem intermediarios.",
-        publish: "Publicar estrutura",
-        save: "Salvar alteracoes",
-        reset: "Cancelar edicao",
-        listTitle: "Itens publicados",
-        listText: "Gerencie as estruturas visiveis no catalogo.",
-        empty: "Nenhuma estrutura publicada.",
-        edit: "Editar",
-        delete: "Excluir",
-        deleteTitle: "Excluir estrutura?",
-        deleteText: "Essa acao remove o item do catalogo e nao pode ser desfeita.",
-        restrictedTitle: "Area exclusiva do administrador",
-        restrictedText: "A permissao e validada pela role do seu perfil no Supabase.",
-        loginText: "Entre com a conta de administrador para continuar.",
-      },
-      toast: {
-        favoriteAdded: "Estrutura adicionada aos favoritos.",
-        favoriteRemoved: "Estrutura removida dos favoritos.",
-        loginRequired: "Entre para salvar favoritos e historico.",
-        demoDownload: "Adicione um link real pelo painel admin para iniciar o download.",
-        downloadStarted: "Download direto iniciado.",
-        itemSaved: "Estrutura publicada com sucesso.",
-        itemUpdated: "Estrutura atualizada com sucesso.",
-        itemDeleted: "Estrutura excluida.",
-        invalidImage: "Escolha uma imagem JPG, PNG ou WebP de ate 5 MB.",
-        invalidUrl: "Informe um link de download HTTPS valido.",
-        genericError: "Nao foi possivel concluir. Tente novamente.",
-      },
-    },
-    en: {
-      nav: {
-        home: "Catalog",
-        homeShort: "Catalog",
-        favorites: "My favorites",
-        favoritesShort: "Favorites",
-        profile: "Profile",
-        admin: "Admin panel",
-      },
-      common: {
-        direct: "Direct download",
-        cancel: "Cancel",
-        delete: "Delete",
-        all: "All",
-        loading: "Loading...",
-        signOut: "Sign out",
-        tryAgain: "Try again",
-      },
-      language: { label: "Language" },
-      search: { placeholder: "Search structures..." },
-      hero: {
-        eyebrow: "Blueprints without limits",
-        title: "Build big. <span>Download now.</span>",
-        subtitle:
-          "Curated Minecraft structures in unified packages, ready for an immediate download.",
-        badge: "Unified file",
-        demo: "Demo mode: connect Supabase in config.js to load your live catalog.",
-      },
-      catalog: {
-        title: "Featured structures",
-        result: "{count} structures ready to build",
-        emptyTitle: "No structures found",
-        emptyText: "Try another search or clear the current filter.",
-        clear: "Clear search",
-        noItemsTitle: "Your catalog is ready for structures",
-        noItemsText: "Open the admin panel and publish the first unified file.",
-      },
-      card: {
-        description: "Complete unified package, ready to download and build.",
-        favorite: "Add to favorites",
-        unfavorite: "Remove from favorites",
-        download: "Download unified pack",
-      },
-      favorites: {
-        eyebrow: "Your collection",
-        title: "My favorites",
-        subtitle: "Every structure you save is gathered here.",
-        count: "{count} saved",
-        emptyTitle: "No favorites yet",
-        emptyText: "Tap the heart on a structure to keep it here.",
-        explore: "Explore catalog",
-      },
-      profile: {
-        eyebrow: "Your activity",
-        title: "Profile",
-        subtitle: "Favorites and recent downloads synced with your account.",
-        member: "Member",
-        admin: "Administrator",
-        favorites: "Favorites",
-        downloads: "Downloads",
-        recentDownloads: "Recent downloads",
-        recentFavorites: "Recent favorites",
-        viewAll: "View all",
-        noDownloads: "Your recent downloads will appear here.",
-        noFavorites: "Your recent favorites will appear here.",
-        downloadedAs: "Unified package downloaded",
-        saved: "Saved structure",
-      },
-      auth: {
-        eyebrow: "Your library",
-        title: "Sign in to save structures",
-        subtitle: "Sync favorites and keep track of your downloads.",
-        loginTab: "Sign in",
-        signupTab: "Create account",
-        name: "Your name",
-        email: "Email",
-        password: "Password",
-        signIn: "Sign in",
-        signUp: "Create my account",
-        account: "My account",
-        confirmEmail: "Account created. Check your email to confirm access.",
-        welcome: "Access granted. Welcome!",
-        configNeeded: "Connect Supabase before using accounts.",
-      },
-      admin: {
-        eyebrow: "Catalog management",
-        title: "Admin panel",
-        subtitle: "Publish each structure with one package for a direct download.",
-        formTitle: "New structure",
-        editTitle: "Edit structure",
-        formText: "Three fields. One file. Two download buttons.",
-        name: "Structure name",
-        namePlaceholder: "Example: Mountain Castle",
-        category: "Category",
-        thumbnail: "Image / thumbnail",
-        thumbnailHelp: "JPG, PNG or WebP up to 5 MB.",
-        downloadUrl: "Single download link",
-        downloadPlaceholder: "https://...",
-        downloadHelp: "The card button opens this exact link with no intermediate step.",
-        publish: "Publish structure",
-        save: "Save changes",
-        reset: "Cancel editing",
-        listTitle: "Published items",
-        listText: "Manage structures visible in the catalog.",
-        empty: "No structures published.",
-        edit: "Edit",
-        delete: "Delete",
-        deleteTitle: "Delete structure?",
-        deleteText: "This removes the item from the catalog and cannot be undone.",
-        restrictedTitle: "Administrator-only area",
-        restrictedText: "Permission is validated from your Supabase profile role.",
-        loginText: "Sign in with the administrator account to continue.",
-      },
-      toast: {
-        favoriteAdded: "Structure added to favorites.",
-        favoriteRemoved: "Structure removed from favorites.",
-        loginRequired: "Sign in to save favorites and history.",
-        demoDownload: "Add a real link in the admin panel to start the download.",
-        downloadStarted: "Direct download started.",
-        itemSaved: "Structure published successfully.",
-        itemUpdated: "Structure updated successfully.",
-        itemDeleted: "Structure deleted.",
-        invalidImage: "Choose a JPG, PNG or WebP image up to 5 MB.",
-        invalidUrl: "Enter a valid HTTPS download link.",
-        genericError: "Could not complete the action. Try again.",
-      },
-    },
-    es: {
-      nav: {
-        home: "Catalogo",
-        homeShort: "Catalogo",
-        favorites: "Mis favoritos",
-        favoritesShort: "Favoritos",
-        profile: "Perfil",
-        admin: "Panel admin",
-      },
-      common: {
-        direct: "Descarga directa",
-        cancel: "Cancelar",
-        delete: "Eliminar",
-        all: "Todas",
-        loading: "Cargando...",
-        signOut: "Cerrar sesion",
-        tryAgain: "Reintentar",
-      },
-      language: { label: "Idioma" },
-      search: { placeholder: "Buscar estructuras..." },
-      hero: {
-        eyebrow: "Planos sin limites",
-        title: "Construye en grande. <span>Descarga ahora.</span>",
-        subtitle:
-          "Estructuras seleccionadas para Minecraft en paquetes unificados de descarga inmediata.",
-        badge: "Archivo unificado",
-        demo: "Modo demo: conecta Supabase en config.js para cargar tu catalogo real.",
-      },
-      catalog: {
-        title: "Estructuras destacadas",
-        result: "{count} estructuras listas para construir",
-        emptyTitle: "No encontramos estructuras",
-        emptyText: "Prueba otra busqueda o limpia el filtro actual.",
-        clear: "Limpiar busqueda",
-        noItemsTitle: "Tu catalogo esta listo para nuevas estructuras",
-        noItemsText: "Abre el panel admin y publica el primer archivo unificado.",
-      },
-      card: {
-        description: "Paquete unificado completo, listo para descargar y construir.",
-        favorite: "Agregar a favoritos",
-        unfavorite: "Quitar de favoritos",
-        download: "Descargar paquete unificado",
-      },
-      favorites: {
-        eyebrow: "Tu coleccion",
-        title: "Mis favoritos",
-        subtitle: "Todas las estructuras que guardes estaran aqui.",
-        count: "{count} guardados",
-        emptyTitle: "Aun no tienes favoritos",
-        emptyText: "Pulsa el corazon de una estructura para guardarla aqui.",
-        explore: "Explorar catalogo",
-      },
-      profile: {
-        eyebrow: "Tu actividad",
-        title: "Perfil",
-        subtitle: "Favoritos y descargas recientes sincronizados con tu cuenta.",
-        member: "Miembro",
-        admin: "Administrador",
-        favorites: "Favoritos",
-        downloads: "Descargas",
-        recentDownloads: "Descargas recientes",
-        recentFavorites: "Favoritos recientes",
-        viewAll: "Ver todos",
-        noDownloads: "Tus descargas recientes apareceran aqui.",
-        noFavorites: "Tus favoritos recientes apareceran aqui.",
-        downloadedAs: "Paquete unificado descargado",
-        saved: "Estructura guardada",
-      },
-      auth: {
-        eyebrow: "Tu biblioteca",
-        title: "Entra para guardar estructuras",
-        subtitle: "Sincroniza favoritos y revisa tus descargas.",
-        loginTab: "Entrar",
-        signupTab: "Crear cuenta",
-        name: "Tu nombre",
-        email: "Correo",
-        password: "Contrasena",
-        signIn: "Entrar",
-        signUp: "Crear mi cuenta",
-        account: "Mi cuenta",
-        confirmEmail: "Cuenta creada. Revisa tu correo para confirmar el acceso.",
-        welcome: "Acceso concedido. Bienvenido.",
-        configNeeded: "Conecta Supabase antes de usar cuentas.",
-      },
-      admin: {
-        eyebrow: "Gestion del catalogo",
-        title: "Panel administrativo",
-        subtitle: "Publica cada estructura con un paquete de descarga directa.",
-        formTitle: "Nueva estructura",
-        editTitle: "Editar estructura",
-        formText: "Tres campos. Un archivo. Dos botones de descarga.",
-        name: "Nombre de la estructura",
-        namePlaceholder: "Ej.: Castillo de la Montana",
-        category: "Categoria",
-        thumbnail: "Imagen / miniatura",
-        thumbnailHelp: "JPG, PNG o WebP de hasta 5 MB.",
-        downloadUrl: "Enlace unico de descarga",
-        downloadPlaceholder: "https://...",
-        downloadHelp: "El boton del card abre exactamente este enlace sin intermediarios.",
-        publish: "Publicar estructura",
-        save: "Guardar cambios",
-        reset: "Cancelar edicion",
-        listTitle: "Items publicados",
-        listText: "Gestiona las estructuras visibles en el catalogo.",
-        empty: "No hay estructuras publicadas.",
-        edit: "Editar",
-        delete: "Eliminar",
-        deleteTitle: "Eliminar estructura?",
-        deleteText: "Esta accion elimina el item y no se puede deshacer.",
-        restrictedTitle: "Area exclusiva del administrador",
-        restrictedText: "El permiso se valida con el rol del perfil en Supabase.",
-        loginText: "Entra con la cuenta administradora para continuar.",
-      },
-      toast: {
-        favoriteAdded: "Estructura agregada a favoritos.",
-        favoriteRemoved: "Estructura eliminada de favoritos.",
-        loginRequired: "Entra para guardar favoritos e historial.",
-        demoDownload: "Agrega un enlace real desde el panel admin.",
-        downloadStarted: "Descarga directa iniciada.",
-        itemSaved: "Estructura publicada correctamente.",
-        itemUpdated: "Estructura actualizada correctamente.",
-        itemDeleted: "Estructura eliminada.",
-        invalidImage: "Elige una imagen JPG, PNG o WebP de hasta 5 MB.",
-        invalidUrl: "Introduce un enlace HTTPS valido.",
-        genericError: "No se pudo completar. Intentalo otra vez.",
-      },
-    },
-  };
-
   const ADMIN_EMAIL = "junindacosta00241@gmail.com";
   const CATEGORIES = ["Houses", "Decorations", "Farms", "Hologram Pack"];
 
@@ -406,14 +21,14 @@
     ...item,
     slug: `estrutura-demo-${index + 1}`,
     description: "",
-    download_url: "#",
+    texture_url: "",
+    mcstructure_url: "",
     image_url: "",
     created_at: new Date(Date.now() - index * 86_400_000).toISOString(),
     demo: true,
   }));
 
   const state = {
-    language: localStorage.getItem("guizz-language") || "pt-BR",
     route: "home",
     search: "",
     filter: "Houses",
@@ -434,16 +49,6 @@
   const authDialog = document.getElementById("auth-dialog");
   const confirmDialog = document.getElementById("confirm-dialog");
 
-  function t(path, values = {}) {
-    const dictionary = translations[state.language] || translations["pt-BR"];
-    const value = path.split(".").reduce((current, key) => current?.[key], dictionary);
-    const fallback = path
-      .split(".")
-      .reduce((current, key) => current?.[key], translations["pt-BR"]);
-    return String(value ?? fallback ?? path).replace(/\{(\w+)\}/g, (_, key) =>
-      values[key] === undefined ? `{${key}}` : String(values[key]),
-    );
-  }
 
   function escapeHtml(value) {
     return String(value ?? "")
@@ -457,7 +62,7 @@
   function safeHttpUrl(value) {
     try {
       const url = new URL(value);
-      return url.protocol === "https:" || url.protocol === "http:" ? url.toString() : "";
+      return url.protocol === "https:" && !url.username && !url.password ? url.toString() : "";
     } catch {
       return "";
     }
@@ -481,7 +86,7 @@
   }
 
   function localeCode() {
-    return state.language === "pt-BR" ? "pt-BR" : state.language;
+    return document.documentElement.lang || "pt-BR";
   }
 
   function formatDate(value) {
@@ -489,6 +94,7 @@
     return new Intl.DateTimeFormat(localeCode(), {
       day: "2-digit",
       month: "short",
+      year: "numeric",
     }).format(new Date(value));
   }
 
@@ -501,22 +107,15 @@
     window.lucide?.createIcons({ attrs: { "aria-hidden": "true" } });
   }
 
-  function applyStaticTranslations() {
-    document.documentElement.lang = state.language;
-    document.querySelectorAll("[data-i18n]").forEach((element) => {
-      element.textContent = t(element.dataset.i18n);
-    });
-    document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
-      element.placeholder = t(element.dataset.i18nPlaceholder);
-    });
-    document.getElementById("language-select").value = state.language;
-    updateAccountButton();
+  function applyLanguage() {
+    const select = document.getElementById("language-select");
+    document.documentElement.lang = select?.value || "pt-BR";
   }
 
   function updateAccountButton() {
     const button = document.getElementById("account-button");
     if (!button) return;
-    const label = state.session ? t("auth.account") : t("auth.signIn");
+    const label = state.session ? "Minha conta" : "Entrar";
     button.innerHTML = `<i data-lucide="${state.session ? "user-round" : "log-in"}"></i><span>${escapeHtml(label)}</span>`;
   }
 
@@ -538,7 +137,7 @@
       <div class="page">
         <div class="catalog-hero"></div>
         <div class="catalog-toolbar"><div class="section-title"><h2>${escapeHtml(
-          t("common.loading"),
+          "Carregando...",
         )}</h2></div></div>
         <div class="items-grid">${Array.from({ length: 6 }, () => '<div class="skeleton"></div>').join("")}</div>
       </div>`;
@@ -554,9 +153,10 @@
 
   function itemCard(item) {
     const isFavorite = state.favoriteIds.has(item.id);
-    const downloadUrl = item.demo ? "#" : safeHttpUrl(item.download_url);
-    const favoriteLabel = t(isFavorite ? "card.unfavorite" : "card.favorite");
-    const description = item.description || t("card.description");
+    const textureUrl = item.demo ? "" : safeHttpUrl(item.texture_url);
+    const mcstructureUrl = item.demo ? "" : safeHttpUrl(item.mcstructure_url);
+    const favoriteLabel = isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos";
+    const description = item.description || "Textura e estrutura prontas para baixar e construir.";
     const category = CATEGORIES.includes(item.category) ? item.category : "Houses";
 
     return `
@@ -575,12 +175,12 @@
         <div class="card-body">
           <h3 title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</h3>
           <p>${escapeHtml(description)}</p>
+          <time class="upload-date" datetime="${escapeHtml(item.created_at)}"><i data-lucide="calendar-days"></i>${escapeHtml("Publicado em")}: ${escapeHtml(formatDate(item.created_at))}</time>
           <div class="download-actions">
-            <a class="download-button" href="${escapeHtml(downloadUrl)}" target="_blank" rel="noopener noreferrer" data-download-id="${escapeHtml(
-              item.id,
-            )}" aria-label="${escapeHtml(t("card.download"))}">
-              <i data-lucide="download"></i><span>${escapeHtml(t("card.download"))}</span>
-            </a>
+            ${[["texture", "Textura", textureUrl], ["mcstructure", "Mcstructure", mcstructureUrl]].map(([format, label, url]) =>
+              url ? `<a class="download-button" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" data-download-id="${escapeHtml(item.id)}" data-format="${format}"><i data-lucide="download"></i><span>${label}</span></a>`
+                : `<button class="download-button" disabled aria-label="${label}: ${escapeHtml("Indisponível")}">${label}</button>`
+            ).join("")}
           </div>
         </div>
       </article>`;
@@ -599,17 +199,17 @@
     const isSearch = kind === "search";
     const isFavorites = kind === "favorites";
     const title = isSearch
-      ? t("catalog.emptyTitle")
+      ? "Nenhuma estrutura encontrada"
       : isFavorites
-        ? t("favorites.emptyTitle")
-        : t("catalog.noItemsTitle");
+        ? "Nenhum favorito por enquanto"
+        : "Seu catálogo está pronto para receber estruturas";
     const text = isSearch
-      ? t("catalog.emptyText")
+      ? "Tente outro termo ou limpe o filtro atual."
       : isFavorites
-        ? t("favorites.emptyText")
-        : t("catalog.noItemsText");
+        ? "Toque no coração de uma estrutura para guardar aqui."
+        : isAdminUser() ? "Acesse o painel admin e publique o primeiro item." : "Tente outro termo ou limpe o filtro atual.";
     const href = isFavorites ? "#/home" : "#/home";
-    const label = isSearch ? t("catalog.clear") : isFavorites ? t("favorites.explore") : t("nav.admin");
+    const label = isSearch ? "Limpar busca" : isFavorites || !isAdminUser() ? "Explorar catálogo" : "Painel admin";
     const action = !isSearch && !isFavorites && isAdminUser() ? "#/admin" : href;
 
     return `
@@ -630,23 +230,23 @@
       <div class="page">
         <section class="catalog-hero" aria-labelledby="catalog-title">
           <div class="hero-copy">
-            <span class="eyebrow">${escapeHtml(t("hero.eyebrow"))}</span>
-            <h1 id="catalog-title">${t("hero.title")}</h1>
-            <p>${escapeHtml(t("hero.subtitle"))}</p>
+            <span class="eyebrow">${escapeHtml("Blueprints sem limites")}</span>
+            <h1 id="catalog-title">${"Construa grande. <span>Baixe agora.</span>"}</h1>
+            <p>${escapeHtml("Texturas e estruturas selecionadas para Minecraft, com downloads diretos e imediatos.")}</p>
           </div>
           <div class="hero-art" aria-hidden="true">
-            <span class="hero-badge"><i data-lucide="package-check"></i>${escapeHtml(t("hero.badge"))}</span>
+            <span class="hero-badge"><i data-lucide="package-check"></i>${escapeHtml("HOLOLAB")}</span>
           </div>
         </section>
         ${
           !isConfigured
-            ? `<div class="config-notice"><i data-lucide="info"></i><span>${escapeHtml(t("hero.demo"))}</span></div>`
+            ? `<div class="config-notice"><i data-lucide="info"></i><span>${escapeHtml("Modo demonstração: conecte o Supabase em config.js para carregar seu catálogo real.")}</span></div>`
             : ""
         }
         <div class="catalog-toolbar">
           <div class="section-title">
-            <h2>${escapeHtml(t("catalog.title"))}</h2>
-            <p>${escapeHtml(t("catalog.result", { count: items.length }))}</p>
+            <h2>${escapeHtml("Estruturas em destaque")}</h2>
+            <p>${items.length} estruturas prontas para construir</p>
           </div>
           <div class="filters" role="group" aria-label="Categorias">
             ${CATEGORIES.map(
@@ -658,7 +258,7 @@
         </div>
         ${
           items.length
-            ? `<section class="items-grid" aria-label="${escapeHtml(t("catalog.title"))}">${items.map(itemCard).join("")}</section>`
+            ? `<section class="items-grid" aria-label="${escapeHtml("Estruturas em destaque")}">${items.map(itemCard).join("")}</section>`
             : renderEmptyState(hasCatalogItems ? "search" : "catalog")
         }
       </div>`;
@@ -674,13 +274,11 @@
       <div class="page">
         <header class="page-heading">
           <div>
-            <span class="eyebrow">${escapeHtml(t("favorites.eyebrow"))}</span>
-            <h1>${escapeHtml(t("favorites.title"))}</h1>
-            <p>${escapeHtml(t("favorites.subtitle"))}</p>
+            <span class="eyebrow">${escapeHtml("Sua coleção")}</span>
+            <h1>${escapeHtml("Meus favoritos")}</h1>
+            <p>${escapeHtml("As estruturas que você salvou ficam reunidas aqui.")}</p>
           </div>
-          <span class="counter"><i data-lucide="heart"></i><strong>${items.length}</strong> ${escapeHtml(
-            t("favorites.count", { count: "" }).trim(),
-          )}</span>
+          <span class="counter"><i data-lucide="heart"></i><strong>${items.length}</strong> salvos</span>
         </header>
         ${items.length ? `<section class="items-grid">${items.map(itemCard).join("")}</section>` : renderEmptyState("favorites")}
       </div>`;
@@ -692,12 +290,12 @@
       <div class="page">
         <div class="access-state">
           <div class="access-icon"><i data-lucide="${isAdmin ? "shield-lock" : "user-round"}"></i></div>
-          <h2>${escapeHtml(isAdmin ? t("admin.restrictedTitle") : t("auth.title"))}</h2>
-          <p>${escapeHtml(isAdmin ? (state.session ? t("admin.restrictedText") : t("admin.loginText")) : t("auth.subtitle"))}</p>
+          <h2>${escapeHtml(isAdmin ? "Área exclusiva do administrador" : "Entre para salvar estruturas")}</h2>
+          <p>${escapeHtml(isAdmin ? (state.session ? "A permissão é validada pela role do seu perfil no Supabase." : "Entre com a conta de administrador para continuar.") : "Sincronize favoritos e acompanhe seus downloads.")}</p>
           ${
             !state.session
-              ? `<button class="primary-button" type="button" data-open-auth>${escapeHtml(t("auth.signIn"))}<i data-lucide="log-in"></i></button>`
-              : `<a class="secondary-button" href="#/home">${escapeHtml(t("nav.home"))}</a>`
+              ? `<button class="primary-button" type="button" data-open-auth>${escapeHtml("Entrar")}<i data-lucide="log-in"></i></button>`
+              : `<a class="secondary-button" href="#/home">${escapeHtml("Catálogo")}</a>`
           }
         </div>
       </div>`;
@@ -713,7 +311,7 @@
   }
 
   function renderDownloadActivity() {
-    if (!state.downloads.length) return `<p class="activity-empty">${escapeHtml(t("profile.noDownloads"))}</p>`;
+    if (!state.downloads.length) return `<p class="activity-empty">${escapeHtml("Seus downloads recentes aparecerão aqui.")}</p>`;
     return state.downloads.slice(0, 5).map((download) => {
       const item = download.items || state.items.find((entry) => entry.id === download.item_id);
       if (!item) return "";
@@ -722,7 +320,7 @@
           ${activityThumb(item)}
           <div class="activity-info">
             <strong>${escapeHtml(item.name)}</strong>
-            <span>${escapeHtml(t("profile.downloadedAs"))}</span>
+            <span>${escapeHtml("Download realizado")}</span>
           </div>
           <time class="activity-time" datetime="${escapeHtml(download.created_at)}">${escapeHtml(formatDate(download.created_at))}</time>
         </div>`;
@@ -734,13 +332,13 @@
       .filter((item) => state.favoriteIds.has(item.id))
       .sort((a, b) => new Date(state.favoriteDates.get(b.id) || b.created_at) - new Date(state.favoriteDates.get(a.id) || a.created_at))
       .slice(0, 4);
-    if (!items.length) return `<p class="activity-empty">${escapeHtml(t("profile.noFavorites"))}</p>`;
+    if (!items.length) return `<p class="activity-empty">${escapeHtml("Seus favoritos recentes aparecerão aqui.")}</p>`;
     return items.map((item) => `
       <div class="activity-row">
         ${activityThumb(item)}
         <div class="activity-info">
           <strong>${escapeHtml(item.name)}</strong>
-          <span>${escapeHtml(t("profile.saved"))}</span>
+          <span>${escapeHtml("Estrutura salva")}</span>
         </div>
         <time class="activity-time" datetime="${escapeHtml(state.favoriteDates.get(item.id) || item.created_at)}">${escapeHtml(
           formatDate(state.favoriteDates.get(item.id) || item.created_at),
@@ -759,9 +357,9 @@
       <div class="page">
         <header class="page-heading">
           <div>
-            <span class="eyebrow">${escapeHtml(t("profile.eyebrow"))}</span>
-            <h1>${escapeHtml(t("profile.title"))}</h1>
-            <p>${escapeHtml(t("profile.subtitle"))}</p>
+            <span class="eyebrow">${escapeHtml("Sua atividade")}</span>
+            <h1>${escapeHtml("Perfil")}</h1>
+            <p>${escapeHtml("Favoritos e downloads recentes sincronizados com sua conta.")}</p>
           </div>
         </header>
         <div class="profile-grid">
@@ -770,22 +368,22 @@
             <h2>${escapeHtml(name)}</h2>
             <p>${escapeHtml(state.session.user.email || "")}</p>
             <span class="profile-role"><i data-lucide="${isAdmin ? "shield-check" : "badge-check"}"></i>${escapeHtml(
-              isAdmin ? t("profile.admin") : t("profile.member"),
+              isAdmin ? "Administrador" : "Membro",
             )}</span>
             <div class="profile-stats">
-              <div class="profile-stat"><strong>${state.favoriteIds.size}</strong><span>${escapeHtml(t("profile.favorites"))}</span></div>
-              <div class="profile-stat"><strong>${state.downloads.length}</strong><span>${escapeHtml(t("profile.downloads"))}</span></div>
+              <div class="profile-stat"><strong>${state.favoriteIds.size}</strong><span>${escapeHtml("Favoritos")}</span></div>
+              <div class="profile-stat"><strong>${state.downloads.length}</strong><span>${escapeHtml("Downloads")}</span></div>
             </div>
-            <button class="secondary-button" type="button" data-sign-out><i data-lucide="log-out"></i>${escapeHtml(t("common.signOut"))}</button>
+            <button class="secondary-button" type="button" data-sign-out><i data-lucide="log-out"></i>${escapeHtml("Sair da conta")}</button>
           </aside>
           <div>
             <section class="activity-card">
-              <div class="activity-heading"><h2>${escapeHtml(t("profile.recentDownloads"))}</h2></div>
+              <div class="activity-heading"><h2>${escapeHtml("Downloads recentes")}</h2></div>
               <div class="activity-list">${renderDownloadActivity()}</div>
             </section>
             <section class="activity-card">
-              <div class="activity-heading"><h2>${escapeHtml(t("profile.recentFavorites"))}</h2><a href="#/favorites">${escapeHtml(
-                t("profile.viewAll"),
+              <div class="activity-heading"><h2>${escapeHtml("Favoritos recentes")}</h2><a href="#/favorites">${escapeHtml(
+                "Ver todos",
               )}</a></div>
               <div class="activity-list">${renderFavoriteActivity()}</div>
             </section>
@@ -810,24 +408,24 @@
       <div class="page">
         <header class="page-heading">
           <div>
-            <span class="eyebrow">${escapeHtml(t("admin.eyebrow"))}</span>
-            <h1>${escapeHtml(t("admin.title"))}</h1>
-            <p>${escapeHtml(t("admin.subtitle"))}</p>
+            <span class="eyebrow">${escapeHtml("Gestão do catálogo")}</span>
+            <h1>${escapeHtml("Painel administrativo")}</h1>
+            <p>${escapeHtml("Publique cada item com links diretos para Textura e Mcstructure.")}</p>
           </div>
         </header>
         <div class="admin-layout">
           <section class="admin-form-card">
-            <h2>${escapeHtml(editingItem ? t("admin.editTitle") : t("admin.formTitle"))}</h2>
-            <p>${escapeHtml(t("admin.formText"))}</p>
+            <h2>${escapeHtml(editingItem ? "Editar estrutura" : "Nova estrutura")}</h2>
+            <p>${escapeHtml("Descrição, imagem por URL e links separados para cada formato.")}</p>
             <form class="admin-form" id="admin-form">
               <label class="field">
-                <span>${escapeHtml(t("admin.name"))}</span>
+                <span>${escapeHtml("Nome da estrutura")}</span>
                 <input id="item-name" name="name" type="text" maxlength="100" required placeholder="${escapeHtml(
-                  t("admin.namePlaceholder"),
+                  "Ex.: Castelo da Montanha",
                 )}" value="${escapeHtml(editingItem?.name || "")}" />
               </label>
               <label class="field">
-                <span>${escapeHtml(t("admin.category"))}</span>
+                <span>${escapeHtml("Categoria")}</span>
                 <select id="item-category" name="category" required>
                   ${CATEGORIES.map(
                     (category) => `<option value="${escapeHtml(category)}"${(editingItem?.category || state.filter) === category ? " selected" : ""}>${escapeHtml(category)}</option>`,
@@ -835,28 +433,32 @@
                 </select>
               </label>
               <label class="field">
-                <span>${escapeHtml(t("admin.thumbnail"))}</span>
-                <input id="item-image" name="image" type="file" accept="image/png,image/jpeg,image/webp" ${editingItem ? "" : "required"} />
-                <small class="field-help">${escapeHtml(t("admin.thumbnailHelp"))}</small>
+                <span>${escapeHtml("Descrição")}</span>
+                <textarea id="item-description" name="description" maxlength="500" required>${escapeHtml(editingItem?.description || "")}</textarea>
               </label>
               <label class="field">
-                <span>${escapeHtml(t("admin.downloadUrl"))}</span>
-                <input id="item-download" name="downloadUrl" type="url" inputmode="url" required placeholder="${escapeHtml(
-                  t("admin.downloadPlaceholder"),
-                )}" value="${escapeHtml(editingItem?.download_url || "")}" />
-                <small class="field-help">${escapeHtml(t("admin.downloadHelp"))}</small>
+                <span>${escapeHtml("URL da imagem")}</span>
+                <input id="item-image-url" name="imageUrl" type="url" required value="${escapeHtml(editingItem?.image_url || "")}" placeholder="https://..." />
+              </label>
+              <label class="field">
+                <span>${escapeHtml("Link da Textura")}</span>
+                <input id="item-texture-url" name="textureUrl" type="url" required value="${escapeHtml(editingItem?.texture_url || "")}" placeholder="https://..." />
+              </label>
+              <label class="field">
+                <span>${escapeHtml("Link do Mcstructure")}</span>
+                <input id="item-mcstructure-url" name="mcstructureUrl" type="url" required value="${escapeHtml(editingItem?.mcstructure_url || "")}" placeholder="https://..." />
               </label>
               <div class="form-actions">
                 <button class="primary-button" type="submit"><i data-lucide="${editingItem ? "save" : "upload-cloud"}"></i>${escapeHtml(
-                  editingItem ? t("admin.save") : t("admin.publish"),
+                  editingItem ? "Salvar alterações" : "Publicar estrutura",
                 )}</button>
-                ${editingItem ? `<button class="secondary-button" type="button" data-reset-admin>${escapeHtml(t("admin.reset"))}</button>` : ""}
+                ${editingItem ? `<button class="secondary-button" type="button" data-reset-admin>${escapeHtml("Cancelar edição")}</button>` : ""}
               </div>
             </form>
           </section>
           <section class="admin-list-card">
-            <h2>${escapeHtml(t("admin.listTitle"))}</h2>
-            <p>${escapeHtml(t("admin.listText"))}</p>
+            <h2>${escapeHtml("Itens publicados")}</h2>
+            <p>${escapeHtml("Gerencie as estruturas visíveis no catálogo.")}</p>
             <div class="admin-items">
               ${
                 realItems.length
@@ -865,15 +467,15 @@
                         (item) => `
                     <div class="admin-row">
                       ${adminThumb(item)}
-                      <div class="admin-row-info"><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.download_url)}</span></div>
+                      <div class="admin-row-info"><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.category)}</span></div>
                       <div class="admin-row-actions">
-                        <button class="icon-button" type="button" data-edit-id="${escapeHtml(item.id)}" title="${escapeHtml(t("admin.edit"))}" aria-label="${escapeHtml(t("admin.edit"))}"><i data-lucide="pencil"></i></button>
-                        <button class="icon-button" type="button" data-delete-id="${escapeHtml(item.id)}" title="${escapeHtml(t("admin.delete"))}" aria-label="${escapeHtml(t("admin.delete"))}"><i data-lucide="trash-2"></i></button>
+                        <button class="icon-button" type="button" data-edit-id="${escapeHtml(item.id)}" title="${escapeHtml("Editar")}" aria-label="${escapeHtml("Editar")}"><i data-lucide="pencil"></i></button>
+                        <button class="icon-button" type="button" data-delete-id="${escapeHtml(item.id)}" title="${escapeHtml("Excluir")}" aria-label="${escapeHtml("Excluir")}"><i data-lucide="trash-2"></i></button>
                       </div>
                     </div>`,
                       )
                       .join("")
-                  : `<p class="activity-empty">${escapeHtml(t("admin.empty"))}</p>`
+                  : `<p class="activity-empty">${escapeHtml("Nenhuma estrutura publicada.")}</p>`
               }
             </div>
           </section>
@@ -896,7 +498,7 @@
     updateAdminVisibility();
     updateAccountButton();
     refreshIcons();
-    app.focus({ preventScroll: true });
+    // Preserve focus while search and card actions update their results.
   }
 
   function showToast(message, type = "info") {
@@ -913,7 +515,7 @@
 
   function openAuthDialog(mode = "login") {
     if (!isConfigured) {
-      showToast(t("auth.configNeeded"), "error");
+      showToast("Conecte o Supabase antes de usar contas.", "error");
       return;
     }
     setAuthMode(mode);
@@ -931,20 +533,39 @@
     authDialog.querySelectorAll(".signup-only").forEach((field) => field.classList.toggle("is-hidden", state.authMode !== "signup"));
     const password = document.getElementById("auth-password");
     password.autocomplete = state.authMode === "signup" ? "new-password" : "current-password";
-    authDialog.querySelector(".auth-submit span").textContent = t(state.authMode === "signup" ? "auth.signUp" : "auth.signIn");
+    authDialog.querySelector(".auth-submit span").textContent = state.authMode === "signup" ? "Criar minha conta" : "Entrar";
+  }
+
+  function authErrorMessage(error) {
+    const code = String(error?.code || "").toLowerCase();
+    const message = String(error?.message || "");
+    if (["user_already_exists", "email_exists"].includes(code) || /already.*registered|already.*exists/i.test(message)) {
+      return "Este e-mail já está em uso. Por favor, faça login ou use outro e-mail.";
+    }
+    if (code === "invalid_credentials" || /invalid login credentials/i.test(message)) {
+      return "E-mail ou senha incorretos.";
+    }
+    if (code === "weak_password" || /password.*(?:weak|short|characters)/i.test(message)) {
+      return "Escolha uma senha mais forte, com pelo menos 6 caracteres.";
+    }
+    if (code === "validation_failed" || /invalid.*email/i.test(message)) {
+      return "Informe um endereço de e-mail válido.";
+    }
+    return "Não foi possível entrar ou criar a conta. Verifique os dados e tente novamente.";
   }
 
   async function handleAuthSubmit(event) {
     event.preventDefault();
     if (!supabaseClient) return;
-    const submit = event.currentTarget.querySelector("button[type='submit']");
+    const authForm = event.currentTarget;
+    const submit = authForm.querySelector("button[type='submit']");
     const feedback = document.getElementById("auth-feedback");
     const email = document.getElementById("auth-email").value.trim();
     const password = document.getElementById("auth-password").value;
     const username = document.getElementById("auth-name").value.trim();
     submit.disabled = true;
     feedback.className = "auth-feedback";
-    feedback.textContent = t("common.loading");
+    feedback.textContent = "Carregando...";
 
     try {
       if (state.authMode === "signup") {
@@ -954,19 +575,35 @@
           options: { data: { username } },
         });
         if (error) throw error;
-        feedback.classList.add("success");
-        feedback.textContent = data.session ? t("auth.welcome") : t("auth.confirmEmail");
-        if (data.session) window.setTimeout(() => authDialog.close(), 650);
+        if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+          const duplicateError = new Error("E-mail já cadastrado");
+          duplicateError.code = "email_exists";
+          throw duplicateError;
+        }
+        if (!data.session) throw new Error("Sessão não retornada pelo cadastro");
+
+        state.session = data.session;
+        authDialog.close();
+        authForm.reset();
+        updateAccountButton();
+        renderRoute();
+        await refreshSessionData(data.session);
       } else {
-        const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        feedback.classList.add("success");
-        feedback.textContent = t("auth.welcome");
-        window.setTimeout(() => authDialog.close(), 450);
+        if (!data.session) throw new Error("Sessão não retornada pelo login");
+
+        state.session = data.session;
+        authDialog.close();
+        authForm.reset();
+        updateAccountButton();
+        renderRoute();
+        await refreshSessionData(data.session);
       }
     } catch (error) {
       feedback.classList.add("error");
-      feedback.textContent = error?.message || t("toast.genericError");
+      feedback.textContent = authErrorMessage(error);
+      feedback.setAttribute("role", "alert");
     } finally {
       submit.disabled = false;
     }
@@ -979,7 +616,7 @@
     }
     const { data, error } = await supabaseClient
       .from("items")
-      .select("id,name,slug,description,category,image_url,download_url,is_published,created_at,updated_at")
+      .select("id,name,slug,description,category,image_url,texture_url,mcstructure_url,is_published,created_at,updated_at")
       .order("created_at", { ascending: false });
     if (error) throw error;
     state.items = data || [];
@@ -993,11 +630,11 @@
     if (!supabaseClient || !state.session?.user) return;
 
     const [profileResult, favoritesResult, downloadsResult] = await Promise.all([
-      supabaseClient.from("profiles").select("id,username,role,language,created_at").eq("id", state.session.user.id).maybeSingle(),
+      supabaseClient.from("profiles").select("id,username,role,created_at").eq("id", state.session.user.id).maybeSingle(),
       supabaseClient.from("favorites").select("item_id,created_at").order("created_at", { ascending: false }),
       supabaseClient
         .from("download_history")
-        .select("id,item_id,format,created_at,items(id,name,category,image_url,download_url)")
+        .select("id,item_id,format,created_at,items(id,name,category,image_url,texture_url,mcstructure_url)")
         .order("created_at", { ascending: false })
         .limit(50),
     ]);
@@ -1020,7 +657,7 @@
       await loadUserData();
     } catch (error) {
       console.error(error);
-      showToast(t("toast.genericError"), "error");
+      showToast("Não foi possível concluir. Tente novamente.", "error");
     }
     updateAdminVisibility();
     updateAccountButton();
@@ -1029,11 +666,11 @@
 
   async function toggleFavorite(itemId) {
     if (!supabaseClient) {
-      showToast(t("auth.configNeeded"), "error");
+      showToast("Conecte o Supabase antes de usar contas.", "error");
       return;
     }
     if (!state.session) {
-      showToast(t("toast.loginRequired"), "info");
+      showToast("Entre para salvar favoritos e histórico.", "info");
       openAuthDialog("login");
       return;
     }
@@ -1053,10 +690,10 @@
       if (wasFavorite) state.favoriteIds.add(itemId);
       else state.favoriteIds.delete(itemId);
       renderRoute();
-      showToast(result.error.message || t("toast.genericError"), "error");
+      showToast(result.error.message || "Não foi possível concluir. Tente novamente.", "error");
       return;
     }
-    showToast(t(wasFavorite ? "toast.favoriteRemoved" : "toast.favoriteAdded"), "success");
+    showToast(wasFavorite ? "Estrutura removida dos favoritos." : "Estrutura adicionada aos favoritos.", "success");
   }
 
   function recordDownload(itemId, format) {
@@ -1086,24 +723,6 @@
     });
   }
 
-  function validateImage(file) {
-    return Boolean(file) && ["image/jpeg", "image/png", "image/webp"].includes(file.type) && file.size <= 5 * 1024 * 1024;
-  }
-
-  async function uploadImage(file) {
-    const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
-    const safeName = slugify(file.name.replace(/\.[^.]+$/, "")) || "thumbnail";
-    const path = `${new Date().getUTCFullYear()}/${crypto.randomUUID()}-${safeName}.${extension}`;
-    const { error } = await supabaseClient.storage.from("item-images").upload(path, file, {
-      cacheControl: "31536000",
-      contentType: file.type,
-      upsert: false,
-    });
-    if (error) throw error;
-    const { data } = supabaseClient.storage.from("item-images").getPublicUrl(path);
-    return data.publicUrl;
-  }
-
   async function handleAdminSubmit(event) {
     event.preventDefault();
     if (!supabaseClient || !isAdminUser()) return;
@@ -1111,32 +730,30 @@
     const submit = form.querySelector("button[type='submit']");
     const name = document.getElementById("item-name").value.trim();
     const category = document.getElementById("item-category").value;
-    const downloadUrl = safeHttpUrl(document.getElementById("item-download").value.trim());
-    const file = document.getElementById("item-image").files[0];
+    const description = document.getElementById("item-description").value.trim();
+    const imageUrl = safeHttpUrl(document.getElementById("item-image-url").value.trim());
+    const textureUrl = safeHttpUrl(document.getElementById("item-texture-url").value.trim());
+    const mcstructureUrl = safeHttpUrl(document.getElementById("item-mcstructure-url").value.trim());
     const editingItem = state.items.find((item) => item.id === state.editingItemId);
 
-    if (!downloadUrl || !downloadUrl.startsWith("https://")) {
-      showToast(t("toast.invalidUrl"), "error");
+    if (!imageUrl || !textureUrl || !mcstructureUrl) {
+      showToast("Informe URLs HTTPS válidas.", "error");
       return;
     }
     if (!CATEGORIES.includes(category)) {
-      showToast(t("toast.genericError"), "error");
+      showToast("Não foi possível concluir. Tente novamente.", "error");
       return;
     }
-    if ((!editingItem && !validateImage(file)) || (file && !validateImage(file))) {
-      showToast(t("toast.invalidImage"), "error");
-      return;
-    }
-
     submit.disabled = true;
     try {
-      const imageUrl = file ? await uploadImage(file) : editingItem.image_url;
       const payload = {
         name,
         category,
         slug: `${slugify(name)}-${String(editingItem?.id || crypto.randomUUID()).slice(0, 8)}`,
         image_url: imageUrl,
-        download_url: downloadUrl,
+        description,
+        texture_url: textureUrl,
+        mcstructure_url: mcstructureUrl,
         is_published: true,
       };
       const result = editingItem
@@ -1148,19 +765,13 @@
       await loadItems();
       renderAdmin();
       refreshIcons();
-      showToast(t(wasEditing ? "toast.itemUpdated" : "toast.itemSaved"), "success");
+      showToast(wasEditing ? "Estrutura atualizada com sucesso." : "Estrutura publicada com sucesso.", "success");
     } catch (error) {
       console.error(error);
-      showToast(error?.message || t("toast.genericError"), "error");
+      showToast(error?.message || "Não foi possível concluir. Tente novamente.", "error");
     } finally {
       submit.disabled = false;
     }
-  }
-
-  function storagePathFromPublicUrl(url) {
-    const marker = "/storage/v1/object/public/item-images/";
-    const index = String(url || "").indexOf(marker);
-    return index >= 0 ? decodeURIComponent(String(url).slice(index + marker.length)) : "";
   }
 
   async function deleteItem() {
@@ -1168,17 +779,15 @@
     if (!item || !supabaseClient || !isAdminUser()) return;
     const { error } = await supabaseClient.from("items").delete().eq("id", item.id);
     if (error) {
-      showToast(error.message || t("toast.genericError"), "error");
+      showToast(error.message || "Não foi possível concluir. Tente novamente.", "error");
       return;
     }
-    const imagePath = storagePathFromPublicUrl(item.image_url);
-    if (imagePath) await supabaseClient.storage.from("item-images").remove([imagePath]);
     state.pendingDeleteId = null;
     if (state.editingItemId === item.id) state.editingItemId = null;
     await loadItems();
     confirmDialog.close();
     renderRoute();
-    showToast(t("toast.itemDeleted"), "success");
+    showToast("Estrutura excluída.", "success");
   }
 
   async function signOut() {
@@ -1201,13 +810,15 @@
     const download = event.target.closest("[data-download-id]");
     if (download) {
       const item = state.items.find((entry) => entry.id === download.dataset.downloadId);
-      if (!item || item.demo || !safeHttpUrl(item.download_url)) {
+      const format = download.dataset.format;
+      const url = item && safeHttpUrl(format === "texture" ? item.texture_url : item.mcstructure_url);
+      if (!item || item.demo || !url || !["texture", "mcstructure"].includes(format)) {
         event.preventDefault();
-        showToast(t("toast.demoDownload"), "info");
+        showToast("Adicione um link real pelo painel admin para iniciar o download.", "info");
         return;
       }
-      recordDownload(item.id, "unified");
-      showToast(t("toast.downloadStarted"), "success");
+      recordDownload(item.id, format);
+      showToast("Download direto iniciado.", "success");
       return;
     }
     const filter = event.target.closest("[data-filter]");
@@ -1278,16 +889,8 @@
       if (event.key === "Escape" && authDialog.open) authDialog.close();
     });
 
-    document.getElementById("language-select").addEventListener("change", async (event) => {
-      state.language = event.target.value;
-      localStorage.setItem("guizz-language", state.language);
-      applyStaticTranslations();
-      setAuthMode(state.authMode);
-      renderRoute();
-      refreshIcons();
-      if (supabaseClient && state.session) {
-        await supabaseClient.from("profiles").update({ language: state.language }).eq("id", state.session.user.id);
-      }
+    document.getElementById("language-select").addEventListener("change", (event) => {
+      document.documentElement.lang = event.target.value;
     });
 
     document.getElementById("account-button").addEventListener("click", () => {
@@ -1313,7 +916,7 @@
 
   async function boot() {
     state.route = getRoute();
-    applyStaticTranslations();
+    applyLanguage();
     attachEvents();
     renderSkeleton();
     updateActiveNavigation();
@@ -1339,7 +942,7 @@
     } catch (error) {
       console.error(error);
       state.items = [];
-      showToast(error?.message || t("toast.genericError"), "error");
+      showToast(error?.message || "Não foi possível concluir. Tente novamente.", "error");
     } finally {
       state.loading = false;
       updateAdminVisibility();

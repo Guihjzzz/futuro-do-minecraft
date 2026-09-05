@@ -1,29 +1,31 @@
-# Guizz Structures
+# Guizz HOLOLAB
 
-Plataforma estatica moderna para catalogar e baixar estruturas de Minecraft. O frontend usa o SDK oficial do Supabase para Auth, Database e Storage; cada card abre diretamente o pacote salvo em `items.download_url`, sem temporizador ou pagina intermediaria.
+Marketplace estático e responsivo para texturas e estruturas de Minecraft. O frontend usa o SDK oficial do Supabase para autenticação e banco de dados. Cada card oferece downloads diretos e independentes de **Textura** e **Mcstructure**, sem contador ou página intermediária.
 
 ## Arquivos principais
 
-- `dist/index.html`: shell acessivel da aplicacao.
-- `dist/styles.css`: design responsivo em dark mode com acentos vermelho-neon.
-- `dist/app.js`: catalogo, idiomas, autenticacao, favoritos, historico e painel admin.
-- `dist/config.js`: URL publica e anon key do Supabase.
-- `supabase.sql`: schema, triggers, grants, bucket e politicas RLS.
+- `dist/index.html`: estrutura da interface, marca HOLOLAB, navegação e redes sociais.
+- `dist/styles.css`: dark mode responsivo com detalhes em vermelho neon.
+- `dist/app.js`: catálogo, filtros, seletor de idioma nativo, autenticação, favoritos, histórico e painel admin.
+- `dist/config.js`: Project URL e chave pública anon/publishable do Supabase.
+- `supabase.sql`: tabelas, migração, funções, permissões e políticas RLS.
+- `HOLOLAB-SETUP.md`: roteiro curto de configuração e publicação.
 
-## 1. Preparar o Supabase
+## Preparar o Supabase
 
-1. Crie um projeto em <https://supabase.com/dashboard>.
-2. Abra **SQL Editor > New query**.
-3. Cole todo o conteudo de `supabase.sql` e clique em **Run**.
-4. O script cria as tabelas `items`, `profiles`, `favorites` e `download_history`, alem do bucket publico `item-images` para as thumbnails.
+1. Abra o projeto no [Supabase Dashboard](https://supabase.com/dashboard).
+2. Vá a **SQL Editor > New query**.
+3. Cole todo o conteúdo de `supabase.sql` e clique em **Run**.
+4. O script cria ou migra `items`, `profiles`, `favorites` e `download_history` de forma transacional.
 
-## 2. Criar o administrador
+Itens antigos que usavam `download_url` têm esse valor copiado para `texture_url` e `mcstructure_url`. A coluna legada permanece apenas para compatibilidade.
 
-1. No painel do Supabase, abra **Authentication > Users**.
-2. Clique em **Add user > Create new user**.
-3. Use o e-mail `junindacosta00241@gmail.com` e a senha definida pelo proprietario do site.
-4. Marque **Auto Confirm User** e confirme a criacao.
-5. Volte ao **SQL Editor** e execute:
+## Criar o administrador
+
+1. Em **Authentication > Users**, clique em **Add user > Create new user**.
+2. Use `junindacosta00241@gmail.com` e uma senha definida somente no painel.
+3. Ative **Auto Confirm User** e crie a conta.
+4. No SQL Editor, execute:
 
 ```sql
 update public.profiles
@@ -35,15 +37,11 @@ where id = (
 );
 ```
 
-6. Entre no site com essa conta. A navegacao do painel admin aparece somente quando `profiles.role = 'admin'` **e** o JWT autenticado pertence exatamente a `junindacosta00241@gmail.com`.
+O link do painel só é renderizado quando o perfil possui `role = 'admin'` e o usuário autenticado tem exatamente esse e-mail. A rota também é protegida, e as políticas RLS repetem a validação no banco. Qualquer cadastro feito pelo site nasce com `role = 'user'`.
 
-A senha nao aparece em nenhum arquivo do frontend. Contas criadas pelo cadastro recebem sempre `role = 'user'`. Mesmo que alguem tente abrir `#/admin` manualmente ou alterar o frontend, as politicas RLS impedem escrita em `items` e no Storage sem a role e o e-mail corretos.
+## Conectar o frontend
 
-## 3. Conexao Supabase
-
-O projeto Supabase ja esta conectado em `dist/config.js` com a Project URL e a chave publica `anon / publishable` fornecidas pelo proprietario.
-
-Se o projeto Supabase for trocado no futuro, edite:
+Preencha `dist/config.js` somente com valores públicos:
 
 ```js
 window.__APP_CONFIG__ = {
@@ -52,35 +50,35 @@ window.__APP_CONFIG__ = {
 };
 ```
 
-Nunca coloque a chave `service_role` nesse arquivo. A anon key e feita para o navegador; a seguranca real vem das politicas RLS do `supabase.sql`.
+Nunca coloque a chave `service_role` no navegador. A proteção real das operações vem das políticas RLS.
 
-## 4. Configurar o Auth para producao
+## Auth instantâneo e e-mail duplicado
 
-Em **Authentication > URL Configuration**:
+Em **Authentication > Providers > Email**, mantenha Email habilitado e **Confirm email** desativado. O cadastro usa a sessão retornada por `supabase.auth.signUp()` imediatamente, fecha o modal e atualiza a interface para o estado autenticado.
 
-- defina **Site URL** com o dominio final, por exemplo `https://www.guizz.xyz`;
-- adicione o dominio local/de preview em **Redirect URLs** se usar confirmacao por e-mail;
-- mantenha o provedor **Email** ativado.
+O seletor PT/EN/ES não mantém traduções no JavaScript: ele altera somente o atributo `lang` do documento para integração com os recursos nativos do navegador.
 
-## 5. Publicar e cadastrar estruturas
+Em **Authentication > URL Configuration**, configure a **Site URL** com o domínio publicado e inclua os endereços de desenvolvimento necessários em **Redirect URLs**.
 
-Sirva a pasta `dist` em qualquer hospedagem estatica. Depois:
+## Publicar itens
 
-1. entre com a conta administradora;
-2. abra **Painel admin**;
-3. escolha uma das quatro categorias permitidas: `Houses`, `Decorations`, `Farms` ou `Hologram Pack`;
-4. informe nome, thumbnail e um unico link HTTPS do pacote;
-5. publique.
+Sirva a pasta `dist` em uma hospedagem estática. No painel admin, informe:
 
-O sistema salva somente um `download_url`. O botao do card renderiza esse valor diretamente em `href`, iniciando a transferencia sem espera ou rota intermediaria. O banco rejeita qualquer categoria fora das quatro listadas acima.
+- nome e descrição;
+- uma das quatro categorias: `Houses`, `Decorations`, `Farms` ou `Hologram Pack`;
+- URL HTTPS pública da imagem;
+- URL HTTPS da Textura;
+- URL HTTPS do Mcstructure.
 
-## Seguranca implementada
+Os links são usados diretamente nos botões do card. Para forçar download em vez de abrir uma página, o servidor de destino deve enviar `Content-Disposition: attachment`.
 
-- RLS ativo em todas as tabelas publicas.
-- Usuarios so leem e alteram seus proprios favoritos e historico.
-- A coluna `profiles.role` nao pode ser atualizada por usuarios autenticados.
-- Escrita em itens e thumbnails exige `public.is_admin()` no banco, que confere role e e-mail.
-- Chave `service_role` nunca e usada no cliente.
+## Segurança aplicada
+
+- RLS ativo em todas as tabelas públicas.
+- Usuários acessam somente seus próprios favoritos e histórico.
+- Novos perfis recebem sempre `role = 'user'`.
+- Usuários autenticados não podem elevar a própria role.
+- Escrita em `items` exige role admin, e-mail exato e e-mail confirmado.
 - URLs de imagem e download exigem HTTPS.
-- CSP restringe scripts, conexoes e recursos externos.
-- Upload de thumbnail limitado a JPG, PNG ou WebP de ate 5 MB.
+- A chave `service_role` não é usada no frontend.
+- CSP limita scripts, conexões e recursos externos permitidos.

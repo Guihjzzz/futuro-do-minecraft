@@ -1,4 +1,5 @@
--- GUIZZ STRUCTURES
+-- Guizz HOLOLAB
+begin;
 -- Execute este arquivo inteiro no SQL Editor do Supabase.
 -- O bloco de compatibilidade tambem atualiza a versao anterior deste schema.
 
@@ -35,12 +36,31 @@ create table if not exists public.items (
   category text not null default 'Houses'
     check (category in ('Houses', 'Decorations', 'Farms', 'Hologram Pack')),
   image_url text not null check (image_url ~ '^https://'),
-  download_url text not null check (download_url ~ '^https://'),
+  download_url text check (download_url ~ '^https://'),
+  texture_url text not null check (texture_url ~ '^https://'),
+  mcstructure_url text not null check (mcstructure_url ~ '^https://'),
   is_published boolean not null default true,
   created_by uuid references auth.users(id) on delete set null default auth.uid(),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+
+-- Preserve legacy URLs while introducing independent downloads.
+alter table public.items add column if not exists description text;
+alter table public.items add column if not exists image_url text;
+alter table public.items add column if not exists texture_url text;
+alter table public.items add column if not exists mcstructure_url text;
+alter table public.items add column if not exists download_url text;
+update public.items set texture_url = download_url where texture_url is null and download_url is not null;
+update public.items set mcstructure_url = download_url where mcstructure_url is null and download_url is not null;
+alter table public.items alter column download_url drop not null;
+alter table public.items alter column texture_url set not null;
+alter table public.items alter column mcstructure_url set not null;
+alter table public.items drop constraint if exists items_texture_url_check;
+alter table public.items add constraint items_texture_url_check check (texture_url ~ '^https://');
+alter table public.items drop constraint if exists items_mcstructure_url_check;
+alter table public.items add constraint items_mcstructure_url_check check (mcstructure_url ~ '^https://');
 
 -- Compatibilidade com a primeira versao: normaliza tudo para as quatro categorias.
 alter table public.items add column if not exists category text;
@@ -67,15 +87,16 @@ create table if not exists public.download_history (
   id bigint generated always as identity primary key,
   user_id uuid not null references auth.users(id) on delete cascade,
   item_id uuid not null references public.items(id) on delete cascade,
-  format text not null default 'unified' check (format = 'unified'),
+  format text not null default 'texture' check (format in ('unified', 'texture', 'mcstructure')),
   created_at timestamptz not null default now()
 );
 
 alter table public.download_history drop constraint if exists download_history_format_check;
-update public.download_history set format = 'unified' where format <> 'unified';
-alter table public.download_history alter column format set default 'unified';
+-- Preserve historical downloads; map only the previous texture label.
+update public.download_history set format = 'texture' where format = 'holoprint';
+alter table public.download_history alter column format set default 'texture';
 alter table public.download_history add constraint download_history_format_check
-  check (format = 'unified');
+  check (format in ('unified', 'texture', 'mcstructure'));
 
 create index if not exists favorites_user_created_idx
   on public.favorites (user_id, created_at desc);
@@ -119,7 +140,8 @@ begin
   insert into public.profiles (id, username, language, role)
   values (
     new.id,
-    nullif(trim(new.raw_user_meta_data ->> 'username'), ''),
+    case when length(trim(new.raw_user_meta_data ->> 'username')) >= 2
+      then left(trim(new.raw_user_meta_data ->> 'username'), 60) else null end,
     'pt-BR',
     'user'
   )
@@ -146,12 +168,13 @@ as $$
     from public.profiles
     where id = auth.uid()
       and role = 'admin'
-      and lower(coalesce(auth.jwt() ->> 'email', '')) = 'junindacosta00241@gmail.com'
+      and exists (select 1 from auth.users u where u.id = auth.uid()
+        and lower(u.email) = 'junindacosta00241@gmail.com' and u.email_confirmed_at is not null)
   );
 $$;
 
 revoke all on function public.is_admin() from public;
-grant execute on function public.is_admin() to authenticated;
+grant execute on function public.is_admin() to anon, authenticated;
 
 alter table public.profiles enable row level security;
 alter table public.items enable row level security;
@@ -251,53 +274,12 @@ grant select, insert, delete on public.favorites to authenticated;
 grant select, insert on public.download_history to authenticated;
 grant usage, select on sequence public.download_history_id_seq to authenticated;
 
--- Bucket publico somente para thumbnails. Escrita e exclusao exigem role admin.
-insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values (
-  'item-images',
-  'item-images',
-  true,
-  5242880,
-  array['image/jpeg', 'image/png', 'image/webp']
-)
-on conflict (id) do update
-set
-  public = excluded.public,
-  file_size_limit = excluded.file_size_limit,
-  allowed_mime_types = excluded.allowed_mime_types;
-
-drop policy if exists "item_images_public_read" on storage.objects;
-create policy "item_images_public_read"
-on storage.objects
-for select
-to public
-using (bucket_id = 'item-images');
-
-drop policy if exists "item_images_admin_insert" on storage.objects;
-create policy "item_images_admin_insert"
-on storage.objects
-for insert
-to authenticated
-with check (bucket_id = 'item-images' and public.is_admin());
-
-drop policy if exists "item_images_admin_update" on storage.objects;
-create policy "item_images_admin_update"
-on storage.objects
-for update
-to authenticated
-using (bucket_id = 'item-images' and public.is_admin())
-with check (bucket_id = 'item-images' and public.is_admin());
-
-drop policy if exists "item_images_admin_delete" on storage.objects;
-create policy "item_images_admin_delete"
-on storage.objects
-for delete
-to authenticated
-using (bucket_id = 'item-images' and public.is_admin());
-
 -- Depois de criar o usuario admin em Authentication > Users, execute apenas:
 -- update public.profiles
 -- set role = 'admin'
 -- where id = (
 --   select id from auth.users where email = 'junindacosta00241@gmail.com'
 -- );
+
+
+commit;

@@ -1825,3 +1825,26 @@ svg {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* HOLOLAB additions: preserve the existing layout and design tokens. */
+.brand-logo { flex-shrink: 0; object-fit: cover; border-radius: 12px; border: 1px solid var(--red-dark); }
+.social-footer { margin-left: var(--sidebar); padding: 24px clamp(14px, 4vw, 56px); border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.social-footer strong { font-family: "Oxanium", sans-serif; letter-spacing: .12em; }
+.social-footer nav { display: flex; flex-wrap: wrap; gap: 12px; }
+.social-footer a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; font-size: .875rem; }
+.social-footer a:hover { color: var(--red-bright); border-color: var(--red); box-shadow: var(--shadow-red); }
+.upload-date { display: flex; align-items: center; gap: 7px; color: var(--muted); margin-bottom: 14px; font-size: .8rem; }
+.download-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.download-button:disabled { opacity: .5; cursor: not-allowed; }
+.card-body p { display: block; min-height: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.field textarea { width: 100%; min-height: 110px; resize: vertical; font: inherit; color: var(--text); background: #09090c; border: 1px solid var(--line); border-radius: 11px; padding: 12px; }
+.field textarea:focus { outline: 2px solid var(--red); outline-offset: 2px; }
+.auth-feedback.error { padding: 12px; background: rgba(255,39,71,.1); border: 1px solid var(--red-dark); border-radius: 10px; }
+@media (max-width: 780px) {
+  .social-footer { margin-left: 0; flex-direction: column; align-items: flex-start; }
+  .language-control { display: flex; }
+  .global-search { min-width: 0; }
+  .card-body p { display: block; }
+  .topbar-actions { flex-shrink: 0; }
+}
+@media (max-width: 380px) { .mobile-brand { display: none; } }
