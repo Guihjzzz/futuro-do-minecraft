@@ -1,6 +1,6 @@
 # Guizz Structures
 
-Plataforma estatica moderna para catalogar e baixar estruturas de Minecraft. O frontend usa Supabase Auth, Database e Storage; os dois botoes de cada card compartilham o mesmo campo `items.download_url`, sem temporizador ou pagina intermediaria.
+Plataforma estatica moderna para catalogar e baixar estruturas de Minecraft. O frontend usa o SDK oficial do Supabase para Auth, Database e Storage; cada card abre diretamente o pacote salvo em `items.download_url`, sem temporizador ou pagina intermediaria.
 
 ## Arquivos principais
 
@@ -35,9 +35,9 @@ where id = (
 );
 ```
 
-6. Entre no site com essa conta. A navegacao do painel admin aparece somente quando `profiles.role = 'admin'`.
+6. Entre no site com essa conta. A navegacao do painel admin aparece somente quando `profiles.role = 'admin'` **e** o JWT autenticado pertence exatamente a `junindacosta00241@gmail.com`.
 
-A senha nao aparece em nenhum arquivo do frontend. Mesmo que alguem tente abrir `#/admin` manualmente, as politicas RLS impedem escrita em `items` e no Storage sem a role correta.
+A senha nao aparece em nenhum arquivo do frontend. Contas criadas pelo cadastro recebem sempre `role = 'user'`. Mesmo que alguem tente abrir `#/admin` manualmente ou alterar o frontend, as politicas RLS impedem escrita em `items` e no Storage sem a role e o e-mail corretos.
 
 ## 3. Conectar URL e Anon Key
 
@@ -68,19 +68,19 @@ Sirva a pasta `dist` em qualquer hospedagem estatica. Depois:
 
 1. entre com a conta administradora;
 2. abra **Painel admin**;
-3. informe nome, thumbnail e um unico link HTTPS do arquivo;
-4. publique.
+3. escolha uma das quatro categorias permitidas: `Houses`, `Decorations`, `Farms` ou `Hologram Pack`;
+4. informe nome, thumbnail e um unico link HTTPS do pacote;
+5. publique.
 
-O sistema salva somente um `download_url`. Tanto **Holoprint** quanto **MCStructure** renderizam esse mesmo valor em `href`, abrindo o download diretamente.
+O sistema salva somente um `download_url`. O botao do card renderiza esse valor diretamente em `href`, iniciando a transferencia sem espera ou rota intermediaria. O banco rejeita qualquer categoria fora das quatro listadas acima.
 
 ## Seguranca implementada
 
 - RLS ativo em todas as tabelas publicas.
 - Usuarios so leem e alteram seus proprios favoritos e historico.
 - A coluna `profiles.role` nao pode ser atualizada por usuarios autenticados.
-- Escrita em itens e thumbnails exige `public.is_admin()` no banco.
+- Escrita em itens e thumbnails exige `public.is_admin()` no banco, que confere role e e-mail.
 - Chave `service_role` nunca e usada no cliente.
 - URLs de imagem e download exigem HTTPS.
 - CSP restringe scripts, conexoes e recursos externos.
 - Upload de thumbnail limitado a JPG, PNG ou WebP de ate 5 MB.
-

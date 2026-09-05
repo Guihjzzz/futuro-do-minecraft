@@ -1,6 +1,6 @@
 -- GUIZZ STRUCTURES
 -- Execute este arquivo inteiro no SQL Editor do Supabase.
--- Ele e idempotente para facilitar ajustes posteriores.
+-- O bloco de compatibilidade tambem atualiza a versao anterior deste schema.
 
 create extension if not exists pgcrypto;
 
@@ -32,19 +32,28 @@ create table if not exists public.items (
   name text not null check (char_length(name) between 2 and 100),
   slug text not null unique check (slug ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'),
   description text check (description is null or char_length(description) <= 500),
+  category text not null default 'Houses'
+    check (category in ('Houses', 'Decorations', 'Farms', 'Hologram Pack')),
   image_url text not null check (image_url ~ '^https://'),
   download_url text not null check (download_url ~ '^https://'),
-  formats text[] not null default array['Holoprint', 'MCStructure']::text[],
   is_published boolean not null default true,
   created_by uuid references auth.users(id) on delete set null default auth.uid(),
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now(),
-  constraint items_unified_formats_check check (
-    formats @> array['Holoprint', 'MCStructure']::text[]
-    and formats <@ array['Holoprint', 'MCStructure']::text[]
-    and cardinality(formats) = 2
-  )
+  updated_at timestamptz not null default now()
 );
+
+-- Compatibilidade com a primeira versao: normaliza tudo para as quatro categorias.
+alter table public.items add column if not exists category text;
+update public.items
+set category = 'Houses'
+where category is null
+   or category not in ('Houses', 'Decorations', 'Farms', 'Hologram Pack');
+alter table public.items alter column category set default 'Houses';
+alter table public.items alter column category set not null;
+alter table public.items drop constraint if exists items_category_check;
+alter table public.items add constraint items_category_check
+  check (category in ('Houses', 'Decorations', 'Farms', 'Hologram Pack'));
+alter table public.items drop column if exists formats;
 
 create table if not exists public.favorites (
   user_id uuid not null references auth.users(id) on delete cascade,
@@ -58,9 +67,15 @@ create table if not exists public.download_history (
   id bigint generated always as identity primary key,
   user_id uuid not null references auth.users(id) on delete cascade,
   item_id uuid not null references public.items(id) on delete cascade,
-  format text not null check (format in ('holoprint', 'mcstructure')),
+  format text not null default 'unified' check (format = 'unified'),
   created_at timestamptz not null default now()
 );
+
+alter table public.download_history drop constraint if exists download_history_format_check;
+update public.download_history set format = 'unified' where format <> 'unified';
+alter table public.download_history alter column format set default 'unified';
+alter table public.download_history add constraint download_history_format_check
+  check (format = 'unified');
 
 create index if not exists favorites_user_created_idx
   on public.favorites (user_id, created_at desc);
@@ -118,7 +133,7 @@ create trigger on_auth_user_created
 after insert on auth.users
 for each row execute function public.handle_new_user();
 
--- Helper central de autorizacao. A role vem do banco, nunca do frontend.
+-- Helper central: exige role admin E o e-mail exato dentro do JWT autenticado.
 create or replace function public.is_admin()
 returns boolean
 language sql
@@ -131,6 +146,7 @@ as $$
     from public.profiles
     where id = auth.uid()
       and role = 'admin'
+      and lower(coalesce(auth.jwt() ->> 'email', '')) = 'junindacosta00241@gmail.com'
   );
 $$;
 
@@ -285,4 +301,3 @@ using (bucket_id = 'item-images' and public.is_admin());
 -- where id = (
 --   select id from auth.users where email = 'junindacosta00241@gmail.com'
 -- );
-

@@ -810,7 +810,7 @@ svg {
 
 .download-actions {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 8px;
 }
 
@@ -830,7 +830,7 @@ svg {
   text-transform: uppercase;
 }
 
-.download-button:first-child {
+.download-button {
   border-color: rgba(255, 39, 71, 0.35);
   background: linear-gradient(135deg, rgba(255, 39, 71, 0.16), rgba(255, 39, 71, 0.045));
 }
@@ -1191,7 +1191,8 @@ svg {
   font-weight: 800;
 }
 
-.field input {
+.field input,
+.field select {
   width: 100%;
   height: 45px;
   border: 1px solid var(--line);
@@ -1202,6 +1203,24 @@ svg {
   color: #fff;
   font-size: 0.86rem;
   transition: 180ms ease;
+}
+
+.field select {
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--red-bright) 50%),
+    linear-gradient(135deg, var(--red-bright) 50%, transparent 50%);
+  background-position:
+    calc(100% - 17px) 19px,
+    calc(100% - 12px) 19px;
+  background-repeat: no-repeat;
+  background-size: 5px 5px, 5px 5px;
+  cursor: pointer;
+}
+
+.field select option {
+  background: #09090c;
+  color: #fff;
 }
 
 .field input[type="file"] {
@@ -1222,7 +1241,8 @@ svg {
   font-weight: 800;
 }
 
-.field input:focus {
+.field input:focus,
+.field select:focus {
   border-color: rgba(255, 39, 71, 0.62);
   box-shadow: 0 0 0 3px rgba(255, 39, 71, 0.07);
 }
@@ -1764,9 +1784,7 @@ svg {
     font-size: 1rem;
   }
 
-  .download-actions {
-    grid-template-columns: 1fr 1fr;
-  }
+  .download-actions { grid-template-columns: 1fr; }
 
   .global-search {
     height: 43px;

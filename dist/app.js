@@ -32,7 +32,7 @@
         eyebrow: "Blueprints sem limites",
         title: "Construa grande. <span>Baixe agora.</span>",
         subtitle:
-          "Estruturas selecionadas para Minecraft em um unico pacote compativel com Holoprint e MCStructure.",
+          "Estruturas selecionadas para Minecraft em pacotes unificados, prontos para download imediato.",
         badge: "Arquivo unificado",
         demo:
           "Modo demonstracao: conecte o Supabase em config.js para carregar seu catalogo real.",
@@ -47,10 +47,10 @@
         noItemsText: "Acesse o painel admin e publique o primeiro arquivo unificado.",
       },
       card: {
-        description: "Pacote completo com os dois formatos de estrutura no mesmo download.",
+        description: "Pacote unificado completo, pronto para baixar e construir.",
         favorite: "Adicionar aos favoritos",
         unfavorite: "Remover dos favoritos",
-        download: "Baixar {format}",
+        download: "Baixar pacote unificado",
       },
       favorites: {
         eyebrow: "Sua colecao",
@@ -74,7 +74,7 @@
         viewAll: "Ver todos",
         noDownloads: "Seus downloads recentes aparecerao aqui.",
         noFavorites: "Seus favoritos recentes aparecerao aqui.",
-        downloadedAs: "Baixado como {format}",
+        downloadedAs: "Pacote unificado baixado",
         saved: "Estrutura salva",
       },
       auth: {
@@ -96,17 +96,18 @@
       admin: {
         eyebrow: "Gestao do catalogo",
         title: "Painel administrativo",
-        subtitle: "Publique estruturas com um unico arquivo para os dois formatos.",
+        subtitle: "Publique cada estrutura com um unico pacote para download direto.",
         formTitle: "Nova estrutura",
         editTitle: "Editar estrutura",
         formText: "Tres campos. Um arquivo. Dois botoes de download.",
         name: "Nome da estrutura",
         namePlaceholder: "Ex.: Castelo da Montanha",
+        category: "Categoria",
         thumbnail: "Imagem / thumbnail",
         thumbnailHelp: "JPG, PNG ou WebP com ate 5 MB.",
         downloadUrl: "Link unico de download",
         downloadPlaceholder: "https://...",
-        downloadHelp: "Holoprint e MCStructure usarao exatamente este mesmo link.",
+        downloadHelp: "O botao do card abre exatamente este link, sem intermediarios.",
         publish: "Publicar estrutura",
         save: "Salvar alteracoes",
         reset: "Cancelar edicao",
@@ -159,7 +160,7 @@
         eyebrow: "Blueprints without limits",
         title: "Build big. <span>Download now.</span>",
         subtitle:
-          "Curated Minecraft structures in one package compatible with Holoprint and MCStructure.",
+          "Curated Minecraft structures in unified packages, ready for an immediate download.",
         badge: "Unified file",
         demo: "Demo mode: connect Supabase in config.js to load your live catalog.",
       },
@@ -173,10 +174,10 @@
         noItemsText: "Open the admin panel and publish the first unified file.",
       },
       card: {
-        description: "Complete package with both structure formats in the same download.",
+        description: "Complete unified package, ready to download and build.",
         favorite: "Add to favorites",
         unfavorite: "Remove from favorites",
-        download: "Download {format}",
+        download: "Download unified pack",
       },
       favorites: {
         eyebrow: "Your collection",
@@ -200,7 +201,7 @@
         viewAll: "View all",
         noDownloads: "Your recent downloads will appear here.",
         noFavorites: "Your recent favorites will appear here.",
-        downloadedAs: "Downloaded as {format}",
+        downloadedAs: "Unified package downloaded",
         saved: "Saved structure",
       },
       auth: {
@@ -222,17 +223,18 @@
       admin: {
         eyebrow: "Catalog management",
         title: "Admin panel",
-        subtitle: "Publish structures with one file for both formats.",
+        subtitle: "Publish each structure with one package for a direct download.",
         formTitle: "New structure",
         editTitle: "Edit structure",
         formText: "Three fields. One file. Two download buttons.",
         name: "Structure name",
         namePlaceholder: "Example: Mountain Castle",
+        category: "Category",
         thumbnail: "Image / thumbnail",
         thumbnailHelp: "JPG, PNG or WebP up to 5 MB.",
         downloadUrl: "Single download link",
         downloadPlaceholder: "https://...",
-        downloadHelp: "Holoprint and MCStructure will use this exact same link.",
+        downloadHelp: "The card button opens this exact link with no intermediate step.",
         publish: "Publish structure",
         save: "Save changes",
         reset: "Cancel editing",
@@ -285,7 +287,7 @@
         eyebrow: "Planos sin limites",
         title: "Construye en grande. <span>Descarga ahora.</span>",
         subtitle:
-          "Estructuras seleccionadas para Minecraft en un solo paquete compatible con Holoprint y MCStructure.",
+          "Estructuras seleccionadas para Minecraft en paquetes unificados de descarga inmediata.",
         badge: "Archivo unificado",
         demo: "Modo demo: conecta Supabase en config.js para cargar tu catalogo real.",
       },
@@ -299,10 +301,10 @@
         noItemsText: "Abre el panel admin y publica el primer archivo unificado.",
       },
       card: {
-        description: "Paquete completo con los dos formatos en la misma descarga.",
+        description: "Paquete unificado completo, listo para descargar y construir.",
         favorite: "Agregar a favoritos",
         unfavorite: "Quitar de favoritos",
-        download: "Descargar {format}",
+        download: "Descargar paquete unificado",
       },
       favorites: {
         eyebrow: "Tu coleccion",
@@ -326,7 +328,7 @@
         viewAll: "Ver todos",
         noDownloads: "Tus descargas recientes apareceran aqui.",
         noFavorites: "Tus favoritos recientes apareceran aqui.",
-        downloadedAs: "Descargado como {format}",
+        downloadedAs: "Paquete unificado descargado",
         saved: "Estructura guardada",
       },
       auth: {
@@ -348,17 +350,18 @@
       admin: {
         eyebrow: "Gestion del catalogo",
         title: "Panel administrativo",
-        subtitle: "Publica estructuras con un archivo para ambos formatos.",
+        subtitle: "Publica cada estructura con un paquete de descarga directa.",
         formTitle: "Nueva estructura",
         editTitle: "Editar estructura",
         formText: "Tres campos. Un archivo. Dos botones de descarga.",
         name: "Nombre de la estructura",
         namePlaceholder: "Ej.: Castillo de la Montana",
+        category: "Categoria",
         thumbnail: "Imagen / miniatura",
         thumbnailHelp: "JPG, PNG o WebP de hasta 5 MB.",
         downloadUrl: "Enlace unico de descarga",
         downloadPlaceholder: "https://...",
-        downloadHelp: "Holoprint y MCStructure usaran exactamente este enlace.",
+        downloadHelp: "El boton del card abre exactamente este enlace sin intermediarios.",
         publish: "Publicar estructura",
         save: "Guardar cambios",
         reset: "Cancelar edicion",
@@ -389,18 +392,20 @@
     },
   };
 
+  const ADMIN_EMAIL = "junindacosta00241@gmail.com";
+  const CATEGORIES = ["Houses", "Decorations", "Farms", "Hologram Pack"];
+
   const demoItems = [
-    { id: "demo-1", name: "Pagode Carmesim", atlasIndex: 0 },
-    { id: "demo-2", name: "Fortaleza Obsidiana", atlasIndex: 1 },
-    { id: "demo-3", name: "Casa Sakura", atlasIndex: 2 },
-    { id: "demo-4", name: "Laboratorio Redstone", atlasIndex: 3 },
-    { id: "demo-5", name: "Porto Nordico", atlasIndex: 4 },
-    { id: "demo-6", name: "Templo do Deserto", atlasIndex: 5 },
+    { id: "demo-1", name: "Pagode Carmesim", atlasIndex: 0, category: "Houses" },
+    { id: "demo-2", name: "Fortaleza Obsidiana", atlasIndex: 1, category: "Hologram Pack" },
+    { id: "demo-3", name: "Casa Sakura", atlasIndex: 2, category: "Houses" },
+    { id: "demo-4", name: "Laboratorio Redstone", atlasIndex: 3, category: "Farms" },
+    { id: "demo-5", name: "Porto Nordico", atlasIndex: 4, category: "Decorations" },
+    { id: "demo-6", name: "Templo do Deserto", atlasIndex: 5, category: "Hologram Pack" },
   ].map((item, index) => ({
     ...item,
     slug: `estrutura-demo-${index + 1}`,
     description: "",
-    formats: ["Holoprint", "MCStructure"],
     download_url: "#",
     image_url: "",
     created_at: new Date(Date.now() - index * 86_400_000).toISOString(),
@@ -411,7 +416,7 @@
     language: localStorage.getItem("guizz-language") || "pt-BR",
     route: "home",
     search: "",
-    filter: "all",
+    filter: "Houses",
     session: null,
     profile: null,
     items: [],
@@ -468,6 +473,13 @@
       .slice(0, 72);
   }
 
+  function isAdminUser() {
+    return (
+      state.profile?.role === "admin" &&
+      state.session?.user?.email?.trim().toLowerCase() === ADMIN_EMAIL
+    );
+  }
+
   function localeCode() {
     return state.language === "pt-BR" ? "pt-BR" : state.language;
   }
@@ -509,7 +521,7 @@
   }
 
   function updateAdminVisibility() {
-    const isAdmin = state.profile?.role === "admin";
+    const isAdmin = isAdminUser();
     document.querySelectorAll(".admin-nav").forEach((element) => {
       element.classList.toggle("is-hidden", !isAdmin);
     });
@@ -545,9 +557,7 @@
     const downloadUrl = item.demo ? "#" : safeHttpUrl(item.download_url);
     const favoriteLabel = t(isFavorite ? "card.unfavorite" : "card.favorite");
     const description = item.description || t("card.description");
-    const formats = Array.isArray(item.formats) && item.formats.length
-      ? item.formats
-      : ["Holoprint", "MCStructure"];
+    const category = CATEGORIES.includes(item.category) ? item.category : "Houses";
 
     return `
       <article class="item-card" data-card-id="${escapeHtml(item.id)}">
@@ -559,7 +569,7 @@
             <i data-lucide="heart"></i>
           </button>
           <div class="media-meta">
-            ${formats.slice(0, 2).map((format) => `<span class="tag">${escapeHtml(format)}</span>`).join("")}
+            <span class="tag">${escapeHtml(category)}</span>
           </div>
         </div>
         <div class="card-body">
@@ -568,13 +578,8 @@
           <div class="download-actions">
             <a class="download-button" href="${escapeHtml(downloadUrl)}" target="_blank" rel="noopener noreferrer" data-download-id="${escapeHtml(
               item.id,
-            )}" data-format="holoprint" aria-label="${escapeHtml(t("card.download", { format: "Holoprint" }))}">
-              <i data-lucide="box"></i><span>Holoprint</span>
-            </a>
-            <a class="download-button" href="${escapeHtml(downloadUrl)}" target="_blank" rel="noopener noreferrer" data-download-id="${escapeHtml(
-              item.id,
-            )}" data-format="mcstructure" aria-label="${escapeHtml(t("card.download", { format: "MCStructure" }))}">
-              <i data-lucide="blocks"></i><span>MCStructure</span>
+            )}" aria-label="${escapeHtml(t("card.download"))}">
+              <i data-lucide="download"></i><span>${escapeHtml(t("card.download"))}</span>
             </a>
           </div>
         </div>
@@ -585,11 +590,7 @@
     const query = state.search.trim().toLocaleLowerCase(localeCode());
     return items.filter((item) => {
       const matchesSearch = !query || `${item.name} ${item.description || ""}`.toLocaleLowerCase(localeCode()).includes(query);
-      const formats = (item.formats || ["Holoprint", "MCStructure"]).map((format) => format.toLowerCase());
-      const matchesFilter =
-        state.filter === "all" ||
-        (state.filter === "holoprint" && formats.includes("holoprint")) ||
-        (state.filter === "mcstructure" && formats.includes("mcstructure"));
+      const matchesFilter = item.category === state.filter;
       return matchesSearch && matchesFilter;
     });
   }
@@ -609,7 +610,7 @@
         : t("catalog.noItemsText");
     const href = isFavorites ? "#/home" : "#/home";
     const label = isSearch ? t("catalog.clear") : isFavorites ? t("favorites.explore") : t("nav.admin");
-    const action = !isSearch && !isFavorites && state.profile?.role === "admin" ? "#/admin" : href;
+    const action = !isSearch && !isFavorites && isAdminUser() ? "#/admin" : href;
 
     return `
       <div class="empty-state">
@@ -647,12 +648,12 @@
             <h2>${escapeHtml(t("catalog.title"))}</h2>
             <p>${escapeHtml(t("catalog.result", { count: items.length }))}</p>
           </div>
-          <div class="filters" role="group" aria-label="Formatos">
-            <button class="filter-pill${state.filter === "all" ? " active" : ""}" type="button" data-filter="all">${escapeHtml(
-              t("common.all"),
-            )}</button>
-            <button class="filter-pill${state.filter === "holoprint" ? " active" : ""}" type="button" data-filter="holoprint"><span class="filter-dot"></span>Holoprint</button>
-            <button class="filter-pill${state.filter === "mcstructure" ? " active" : ""}" type="button" data-filter="mcstructure"><span class="filter-dot"></span>MCStructure</button>
+          <div class="filters" role="group" aria-label="Categorias">
+            ${CATEGORIES.map(
+              (category) => `<button class="filter-pill${state.filter === category ? " active" : ""}" type="button" data-filter="${escapeHtml(
+                category,
+              )}"><span class="filter-dot"></span>${escapeHtml(category)}</button>`,
+            ).join("")}
           </div>
         </div>
         ${
@@ -721,7 +722,7 @@
           ${activityThumb(item)}
           <div class="activity-info">
             <strong>${escapeHtml(item.name)}</strong>
-            <span>${escapeHtml(t("profile.downloadedAs", { format: download.format === "holoprint" ? "Holoprint" : "MCStructure" }))}</span>
+            <span>${escapeHtml(t("profile.downloadedAs"))}</span>
           </div>
           <time class="activity-time" datetime="${escapeHtml(download.created_at)}">${escapeHtml(formatDate(download.created_at))}</time>
         </div>`;
@@ -752,7 +753,7 @@
       renderAccessState("profile");
       return;
     }
-    const isAdmin = state.profile?.role === "admin";
+    const isAdmin = isAdminUser();
     const name = state.profile?.username || state.session.user.email?.split("@")[0] || "Player";
     app.innerHTML = `
       <div class="page">
@@ -799,7 +800,7 @@
   }
 
   function renderAdmin() {
-    if (!state.session || state.profile?.role !== "admin") {
+    if (!state.session || !isAdminUser()) {
       renderAccessState("admin");
       return;
     }
@@ -824,6 +825,14 @@
                 <input id="item-name" name="name" type="text" maxlength="100" required placeholder="${escapeHtml(
                   t("admin.namePlaceholder"),
                 )}" value="${escapeHtml(editingItem?.name || "")}" />
+              </label>
+              <label class="field">
+                <span>${escapeHtml(t("admin.category"))}</span>
+                <select id="item-category" name="category" required>
+                  ${CATEGORIES.map(
+                    (category) => `<option value="${escapeHtml(category)}"${(editingItem?.category || state.filter) === category ? " selected" : ""}>${escapeHtml(category)}</option>`,
+                  ).join("")}
+                </select>
               </label>
               <label class="field">
                 <span>${escapeHtml(t("admin.thumbnail"))}</span>
@@ -970,7 +979,7 @@
     }
     const { data, error } = await supabaseClient
       .from("items")
-      .select("id,name,slug,description,image_url,download_url,formats,is_published,created_at,updated_at")
+      .select("id,name,slug,description,category,image_url,download_url,is_published,created_at,updated_at")
       .order("created_at", { ascending: false });
     if (error) throw error;
     state.items = data || [];
@@ -988,7 +997,7 @@
       supabaseClient.from("favorites").select("item_id,created_at").order("created_at", { ascending: false }),
       supabaseClient
         .from("download_history")
-        .select("id,item_id,format,created_at,items(id,name,image_url,download_url,formats)")
+        .select("id,item_id,format,created_at,items(id,name,category,image_url,download_url)")
         .order("created_at", { ascending: false })
         .limit(50),
     ]);
@@ -1097,16 +1106,21 @@
 
   async function handleAdminSubmit(event) {
     event.preventDefault();
-    if (!supabaseClient || state.profile?.role !== "admin") return;
+    if (!supabaseClient || !isAdminUser()) return;
     const form = event.currentTarget;
     const submit = form.querySelector("button[type='submit']");
     const name = document.getElementById("item-name").value.trim();
+    const category = document.getElementById("item-category").value;
     const downloadUrl = safeHttpUrl(document.getElementById("item-download").value.trim());
     const file = document.getElementById("item-image").files[0];
     const editingItem = state.items.find((item) => item.id === state.editingItemId);
 
     if (!downloadUrl || !downloadUrl.startsWith("https://")) {
       showToast(t("toast.invalidUrl"), "error");
+      return;
+    }
+    if (!CATEGORIES.includes(category)) {
+      showToast(t("toast.genericError"), "error");
       return;
     }
     if ((!editingItem && !validateImage(file)) || (file && !validateImage(file))) {
@@ -1119,10 +1133,10 @@
       const imageUrl = file ? await uploadImage(file) : editingItem.image_url;
       const payload = {
         name,
+        category,
         slug: `${slugify(name)}-${String(editingItem?.id || crypto.randomUUID()).slice(0, 8)}`,
         image_url: imageUrl,
         download_url: downloadUrl,
-        formats: ["Holoprint", "MCStructure"],
         is_published: true,
       };
       const result = editingItem
@@ -1151,7 +1165,7 @@
 
   async function deleteItem() {
     const item = state.items.find((entry) => entry.id === state.pendingDeleteId);
-    if (!item || !supabaseClient || state.profile?.role !== "admin") return;
+    if (!item || !supabaseClient || !isAdminUser()) return;
     const { error } = await supabaseClient.from("items").delete().eq("id", item.id);
     if (error) {
       showToast(error.message || t("toast.genericError"), "error");
@@ -1192,7 +1206,7 @@
         showToast(t("toast.demoDownload"), "info");
         return;
       }
-      recordDownload(item.id, download.dataset.format);
+      recordDownload(item.id, "unified");
       showToast(t("toast.downloadStarted"), "success");
       return;
     }
@@ -1208,7 +1222,7 @@
       event.preventDefault();
       state.search = "";
       document.getElementById("search-input").value = "";
-      state.filter = "all";
+      state.filter = "Houses";
       renderRoute();
       return;
     }
