@@ -30,6 +30,7 @@
     texture_url: "",
     mcstructure_url: "",
     image_url: "",
+    downloads: [142, 96, 81, 67, 54, 39][index],
     created_at: new Date(Date.now() - index * 86_400_000).toISOString(),
     demo: true,
   }));
@@ -38,6 +39,7 @@
     route: "home",
     search: "",
     filter: "Houses",
+    sort: "recent",
     session: null,
     profile: null,
     items: [],
@@ -49,6 +51,7 @@
     pendingDeleteId: null,
     authMode: "login",
     authProvider: null,
+    sharedItemToken: null,
   };
 
   let supabaseClient = null;
@@ -57,6 +60,347 @@
   const app = document.getElementById("app");
   const authDialog = document.getElementById("auth-dialog");
   const confirmDialog = document.getElementById("confirm-dialog");
+
+  const translationManager = (() => {
+    const SOURCE_LANGUAGE = "pt";
+    const LANGUAGE_CODES = { "pt-BR": "pt", en: "en", es: "es" };
+    const STORAGE_KEY = "app_lang";
+    const CACHE_KEY = "hololab-translations-v1";
+    const TRANSLATABLE_ATTRIBUTES = ["alt", "aria-label", "placeholder", "title"];
+    const SKIP_SELECTOR =
+      'script, style, noscript, code, pre, kbd, samp, svg, textarea, #language-select, #language-select option, #item-category, #item-category option, [translate="no"], [data-no-translate]';
+    const originalText = new WeakMap();
+    const appliedText = new WeakMap();
+    const originalAttributes = new WeakMap();
+    const appliedAttributes = new WeakMap();
+    const pendingRoots = new Set();
+    const memoryCache = new Map();
+    let observer = null;
+    const requestControllers = new Set();
+    const requestQueue = new Map();
+    const inFlightTranslations = new Map();
+    let targetLanguage = SOURCE_LANGUAGE;
+    let locale = "pt-BR";
+    let revision = 0;
+    let flushTimer = 0;
+    let requestTimer = 0;
+    let translationErrorShown = false;
+
+    try {
+      const savedCache = JSON.parse(localStorage.getItem(CACHE_KEY) || "[]");
+      if (Array.isArray(savedCache)) {
+        savedCache.slice(-400).forEach(([key, value]) => {
+          if (typeof key === "string" && typeof value === "string") memoryCache.set(key, value);
+        });
+      }
+    } catch (error) {
+      console.warn("Cache de tradução ignorado:", error);
+    }
+
+    function persistCache() {
+      try {
+        const entries = Array.from(memoryCache.entries()).slice(-400);
+        localStorage.setItem(CACHE_KEY, JSON.stringify(entries));
+      } catch (error) {
+        console.warn("Não foi possível salvar o cache de tradução:", error);
+      }
+    }
+
+    function persistLocale(value) {
+      try {
+        localStorage.setItem(STORAGE_KEY, value);
+      } catch (error) {
+        console.warn("Não foi possível salvar o idioma escolhido:", error);
+      }
+    }
+
+    function isEligibleElement(element) {
+      return Boolean(element && !element.isContentEditable && !element.closest(SKIP_SELECTOR));
+    }
+
+    function isEligibleText(value) {
+      const text = String(value || "").trim();
+      return (
+        text.length > 1 &&
+        /[A-Za-zÀ-ÿ]/.test(text) &&
+        !CATEGORIES.includes(text) &&
+        !/^(?:https?:\/\/|mailto:|tel:)/i.test(text)
+      );
+    }
+
+    function splitWhitespace(value) {
+      const leading = value.match(/^\s*/)?.[0] || "";
+      const trailing = value.match(/\s*$/)?.[0] || "";
+      return { leading, text: value.slice(leading.length, value.length - trailing.length), trailing };
+    }
+
+    function rememberText(node) {
+      const current = node.nodeValue || "";
+      const lastApplied = appliedText.get(node);
+      const savedOriginal = originalText.get(node);
+      if (
+        !originalText.has(node) ||
+        (lastApplied && lastApplied.value !== current) ||
+        (!lastApplied && savedOriginal !== current)
+      ) {
+        originalText.set(node, current);
+        appliedText.delete(node);
+      }
+      return originalText.get(node) || "";
+    }
+
+    function attributeMap(store, element) {
+      if (!store.has(element)) store.set(element, new Map());
+      return store.get(element);
+    }
+
+    function rememberAttribute(element, attribute) {
+      const current = element.getAttribute(attribute) || "";
+      const originals = attributeMap(originalAttributes, element);
+      const applied = attributeMap(appliedAttributes, element);
+      const lastApplied = applied.get(attribute);
+      const savedOriginal = originals.get(attribute);
+      if (!originals.has(attribute) || (lastApplied && lastApplied.value !== current) || (!lastApplied && savedOriginal !== current)) {
+        originals.set(attribute, current);
+        applied.delete(attribute);
+      }
+      return originals.get(attribute) || "";
+    }
+
+    async function flushTranslationRequests() {
+      const entries = Array.from(requestQueue.values());
+      requestQueue.clear();
+      if (!entries.length || targetLanguage === SOURCE_LANGUAGE) return;
+      entries.forEach((entry) => inFlightTranslations.set(entry.key, entry));
+
+      const requestedLanguage = targetLanguage;
+      const controller = new AbortController();
+      requestControllers.add(controller);
+
+      try {
+        for (let index = 0; index < entries.length; index += 50) {
+          const batch = entries.slice(index, index + 50);
+          const response = await fetch("/api/translate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              targetLanguage: requestedLanguage,
+              texts: batch.map((entry) => entry.text),
+            }),
+            signal: controller.signal,
+          });
+          const result = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(result.error || "A tradução não respondeu corretamente.");
+          if (!Array.isArray(result.translations) || result.translations.length !== batch.length) {
+            throw new Error("A resposta da tradução está incompleta.");
+          }
+
+          batch.forEach((entry, batchIndex) => {
+            const translated = String(result.translations[batchIndex] || entry.text).trim() || entry.text;
+            memoryCache.set(entry.key, translated);
+            inFlightTranslations.delete(entry.key);
+            entry.resolve(translated);
+          });
+        }
+        persistCache();
+      } catch (error) {
+        entries.forEach((entry) => {
+          inFlightTranslations.delete(entry.key);
+          entry.reject(error);
+        });
+        if (error.name !== "AbortError" && !translationErrorShown) {
+          translationErrorShown = true;
+          showToast(error.message || "Não foi possível traduzir esta página.", "error");
+        }
+      } finally {
+        requestControllers.delete(controller);
+      }
+    }
+
+    function cancelTranslationRequests() {
+      window.clearTimeout(requestTimer);
+      requestControllers.forEach((controller) => controller.abort());
+      requestControllers.clear();
+      const error = new DOMException("Tradução cancelada.", "AbortError");
+      requestQueue.forEach((entry) => entry.reject(error));
+      inFlightTranslations.forEach((entry) => entry.reject(error));
+      requestQueue.clear();
+      inFlightTranslations.clear();
+    }
+
+    function translateString(text) {
+      if (targetLanguage === SOURCE_LANGUAGE) return Promise.resolve(text);
+      const key = `${targetLanguage}\u0000${text}`;
+      if (memoryCache.has(key)) return Promise.resolve(memoryCache.get(key));
+      if (requestQueue.has(key)) return requestQueue.get(key).promise;
+      if (inFlightTranslations.has(key)) return inFlightTranslations.get(key).promise;
+
+      let resolve;
+      let reject;
+      const promise = new Promise((resolvePromise, rejectPromise) => {
+        resolve = resolvePromise;
+        reject = rejectPromise;
+      });
+      requestQueue.set(key, { key, text, promise, resolve, reject });
+      window.clearTimeout(requestTimer);
+      requestTimer = window.setTimeout(flushTranslationRequests, 35);
+      return promise;
+    }
+
+    async function translateTextNode(node, activeRevision) {
+      if (!node.isConnected || !isEligibleElement(node.parentElement)) return;
+      const lastApplied = appliedText.get(node);
+      if (lastApplied?.language === targetLanguage && lastApplied.value === node.nodeValue) return;
+      const source = rememberText(node);
+      const { leading, text, trailing } = splitWhitespace(source);
+      if (!isEligibleText(text)) return;
+      try {
+        const translated = await translateString(text);
+        if (!node.isConnected || activeRevision !== revision) return;
+        const value = `${leading}${translated}${trailing}`;
+        appliedText.set(node, { language: targetLanguage, value });
+        node.nodeValue = value;
+      } catch (error) {
+        if (error.name !== "AbortError") console.error("Falha ao traduzir texto:", error);
+      }
+    }
+
+    async function translateAttribute(element, attribute, activeRevision) {
+      if (!element.isConnected || !element.hasAttribute(attribute) || !isEligibleElement(element)) return;
+      const applied = attributeMap(appliedAttributes, element);
+      const lastApplied = applied.get(attribute);
+      if (lastApplied?.language === targetLanguage && lastApplied.value === element.getAttribute(attribute)) return;
+      const source = rememberAttribute(element, attribute);
+      if (!isEligibleText(source)) return;
+      try {
+        const translated = await translateString(source);
+        if (!element.isConnected || activeRevision !== revision) return;
+        applied.set(attribute, { language: targetLanguage, value: translated });
+        element.setAttribute(attribute, translated);
+      } catch (error) {
+        if (error.name !== "AbortError") console.error(`Falha ao traduzir ${attribute}:`, error);
+      }
+    }
+
+    function scan(root) {
+      if (!root || targetLanguage === SOURCE_LANGUAGE) return;
+      const activeRevision = revision;
+      if (root.nodeType === Node.TEXT_NODE) {
+        void translateTextNode(root, activeRevision);
+        return;
+      }
+      if (root.nodeType !== Node.ELEMENT_NODE && root.nodeType !== Node.DOCUMENT_FRAGMENT_NODE) return;
+      const element = root.nodeType === Node.ELEMENT_NODE ? root : null;
+      if (element && !isEligibleElement(element)) return;
+
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode(node) {
+          return isEligibleElement(node.parentElement) && isEligibleText(node.nodeValue)
+            ? NodeFilter.FILTER_ACCEPT
+            : NodeFilter.FILTER_REJECT;
+        },
+      });
+      let textNode = walker.nextNode();
+      while (textNode) {
+        void translateTextNode(textNode, activeRevision);
+        textNode = walker.nextNode();
+      }
+
+      const elements = [];
+      if (element) elements.push(element);
+      if (root.querySelectorAll) elements.push(...root.querySelectorAll("[alt], [aria-label], [placeholder], [title]"));
+      elements.forEach((entry) => {
+        TRANSLATABLE_ATTRIBUTES.forEach((attribute) => {
+          if (entry.hasAttribute(attribute)) void translateAttribute(entry, attribute, activeRevision);
+        });
+      });
+    }
+
+    function queue(root) {
+      if (!root || targetLanguage === SOURCE_LANGUAGE) return;
+      pendingRoots.add(root);
+      window.clearTimeout(flushTimer);
+      flushTimer = window.setTimeout(() => {
+        const roots = Array.from(pendingRoots);
+        pendingRoots.clear();
+        roots.forEach(scan);
+      }, 50);
+    }
+
+    function restore(root = document.body) {
+      if (!root) return;
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      let node = walker.nextNode();
+      while (node) {
+        if (originalText.has(node)) {
+          const value = originalText.get(node);
+          appliedText.set(node, { language: SOURCE_LANGUAGE, value });
+          node.nodeValue = value;
+        }
+        node = walker.nextNode();
+      }
+      root.querySelectorAll?.("[alt], [aria-label], [placeholder], [title]").forEach((element) => {
+        const originals = originalAttributes.get(element);
+        if (!originals) return;
+        originals.forEach((value, attribute) => {
+          attributeMap(appliedAttributes, element).set(attribute, { language: SOURCE_LANGUAGE, value });
+          element.setAttribute(attribute, value);
+        });
+      });
+    }
+
+    async function setLanguage(nextLocale) {
+      const normalizedLocale = Object.hasOwn(LANGUAGE_CODES, nextLocale) ? nextLocale : "pt-BR";
+      const nextTarget = LANGUAGE_CODES[normalizedLocale];
+      cancelTranslationRequests();
+      locale = normalizedLocale;
+      targetLanguage = nextTarget;
+      revision += 1;
+      translationErrorShown = false;
+      pendingRoots.clear();
+      window.clearTimeout(flushTimer);
+      document.documentElement.lang = normalizedLocale;
+      persistLocale(normalizedLocale);
+
+      if (nextTarget === SOURCE_LANGUAGE) {
+        restore();
+        return true;
+      }
+
+      scan(document.body);
+      return true;
+    }
+
+    function start() {
+      if (observer || !document.body) return;
+      observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === "characterData") queue(mutation.target);
+          else if (mutation.type === "attributes") queue(mutation.target);
+          else mutation.addedNodes.forEach(queue);
+        });
+      });
+      observer.observe(document.body, {
+        attributes: true,
+        attributeFilter: TRANSLATABLE_ATTRIBUTES,
+        characterData: true,
+        childList: true,
+        subtree: true,
+      });
+    }
+
+    function savedLocale() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY) || "pt-BR";
+        return Object.hasOwn(LANGUAGE_CODES, saved) ? saved : "pt-BR";
+      } catch (error) {
+        console.warn("Não foi possível recuperar o idioma escolhido:", error);
+        return "pt-BR";
+      }
+    }
+
+    return { locale: () => locale, queue, savedLocale, setLanguage, start };
+  })();
 
 
   function escapeHtml(value) {
@@ -194,7 +538,7 @@
   }
 
   function localeCode() {
-    return document.documentElement.lang || "pt-BR";
+    return translationManager.locale();
   }
 
   function formatDate(value) {
@@ -204,6 +548,19 @@
       month: "short",
       year: "numeric",
     }).format(new Date(value));
+  }
+
+  function itemDownloads(item) {
+    const value = Number(item?.downloads || 0);
+    return Number.isFinite(value) && value >= 0 ? Math.trunc(value) : 0;
+  }
+
+  function formatDownloads(value) {
+    return new Intl.NumberFormat(localeCode(), { notation: "compact", maximumFractionDigits: 1 }).format(value);
+  }
+
+  function downloadCountLabel(value) {
+    return value === 1 ? "baixou" : "baixaram";
   }
 
   function getRoute() {
@@ -217,7 +574,9 @@
 
   function applyLanguage() {
     const select = document.getElementById("language-select");
-    document.documentElement.lang = select?.value || "pt-BR";
+    const savedLocale = translationManager.savedLocale();
+    if (select) select.value = savedLocale;
+    document.documentElement.lang = savedLocale;
   }
 
   function updateAccountButton() {
@@ -256,7 +615,9 @@
       return `<div class="${compact ? "activity-thumb " : ""}atlas-image atlas-${Number(item.atlasIndex) || 0}" role="img" aria-label="${escapeHtml(item.name)}"></div>`;
     }
     const image = safeHttpUrl(item.image_url);
-    return `<img${compact ? ' class="activity-thumb"' : ""} src="${escapeHtml(image)}" alt="${escapeHtml(item.name)}" loading="lazy" decoding="async" />`;
+    return `<img class="${compact ? "activity-thumb" : "card-image"}" src="${escapeHtml(image)}" alt="${escapeHtml(
+      item.name,
+    )}" loading="lazy" decoding="async"${compact ? "" : " data-card-image"} />`;
   }
 
   function itemCard(item) {
@@ -266,10 +627,11 @@
     const favoriteLabel = isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos";
     const description = item.description || "Textura e estrutura prontas para baixar e construir.";
     const category = CATEGORIES.includes(item.category) ? item.category : "Houses";
+    const downloads = itemDownloads(item);
 
     return `
       <article class="item-card" data-card-id="${escapeHtml(item.id)}">
-        <div class="card-media">
+        <div class="card-media${item.demo ? "" : " is-image-loading"}">
           ${mediaMarkup(item)}
           <button class="favorite-button${isFavorite ? " active" : ""}" type="button" data-favorite-id="${escapeHtml(
             item.id,
@@ -284,6 +646,15 @@
           <h3 title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</h3>
           <p>${escapeHtml(description)}</p>
           <time class="upload-date" datetime="${escapeHtml(item.created_at)}"><i data-lucide="calendar-days"></i>${escapeHtml("Publicado em")}: ${escapeHtml(formatDate(item.created_at))}</time>
+          <div class="card-meta-actions">
+            <span class="download-count" data-download-count="${escapeHtml(item.id)}">
+              <i data-lucide="download"></i><strong>${escapeHtml(formatDownloads(downloads))}</strong>
+              <span data-download-label>${escapeHtml(downloadCountLabel(downloads))}</span>
+            </span>
+            <button class="share-button" type="button" data-share-id="${escapeHtml(item.id)}" aria-label="${escapeHtml(
+              `Compartilhar ${item.name}`,
+            )}"><i data-lucide="share-2"></i><span>${escapeHtml("Compartilhar")}</span></button>
+          </div>
           <div class="download-actions">
             ${[["texture", "Textura", textureUrl], ["mcstructure", "Mcstructure", mcstructureUrl]].map(([format, label, url]) =>
               url ? `<a class="download-button" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" data-download-id="${escapeHtml(item.id)}" data-format="${format}"><i data-lucide="download"></i><span>${label}</span></a>`
@@ -300,6 +671,16 @@
       const matchesSearch = !query || `${item.name} ${item.description || ""}`.toLocaleLowerCase(localeCode()).includes(query);
       const matchesFilter = item.category === state.filter;
       return matchesSearch && matchesFilter;
+    });
+  }
+
+  function sortedItems(items) {
+    return [...items].sort((left, right) => {
+      if (state.sort === "downloads") {
+        const downloadDifference = itemDownloads(right) - itemDownloads(left);
+        if (downloadDifference) return downloadDifference;
+      }
+      return new Date(right.created_at).getTime() - new Date(left.created_at).getTime();
     });
   }
 
@@ -332,7 +713,18 @@
   }
 
   function renderHome() {
-    const items = filteredItems();
+    const sharedToken = new URLSearchParams(window.location.hash.split("?")[1] || "").get("item");
+    const sharedItem = sharedToken
+      ? state.items.find((item) => String(item.id) === sharedToken || item.slug === sharedToken)
+      : null;
+    const shouldRevealSharedItem = Boolean(sharedItem && sharedToken !== state.sharedItemToken);
+    if (shouldRevealSharedItem) {
+      state.filter = sharedItem.category;
+      state.search = "";
+      const searchInput = document.getElementById("search-input");
+      if (searchInput) searchInput.value = "";
+    }
+    const items = sortedItems(filteredItems());
     const hasCatalogItems = state.items.length > 0;
     app.innerHTML = `
       <div class="page">
@@ -356,12 +748,21 @@
             <h2>${escapeHtml("Estruturas em destaque")}</h2>
             <p>${items.length} estruturas prontas para construir</p>
           </div>
-          <div class="filters" role="group" aria-label="Categorias">
-            ${CATEGORIES.map(
-              (category) => `<button class="filter-pill${state.filter === category ? " active" : ""}" type="button" data-filter="${escapeHtml(
-                category,
-              )}"><span class="filter-dot"></span>${escapeHtml(category)}</button>`,
-            ).join("")}
+          <div class="catalog-controls">
+            <label class="sort-control" for="catalog-sort">
+              <span>${escapeHtml("Ordenar por")}</span>
+              <select id="catalog-sort" data-catalog-sort aria-label="${escapeHtml("Ordenar estruturas")}">
+                <option value="recent"${state.sort === "recent" ? " selected" : ""}>${escapeHtml("Mais recentes")}</option>
+                <option value="downloads"${state.sort === "downloads" ? " selected" : ""}>${escapeHtml("Mais baixados")}</option>
+              </select>
+            </label>
+            <div class="filters" role="group" aria-label="Categorias">
+              ${CATEGORIES.map(
+                (category) => `<button class="filter-pill${state.filter === category ? " active" : ""}" type="button" data-filter="${escapeHtml(
+                  category,
+                )}"><span class="filter-dot"></span>${escapeHtml(category)}</button>`,
+              ).join("")}
+            </div>
           </div>
         </div>
         ${
@@ -370,6 +771,16 @@
             : renderEmptyState(hasCatalogItems ? "search" : "catalog")
         }
       </div>`;
+    state.sharedItemToken = sharedToken;
+    if (shouldRevealSharedItem) {
+      window.setTimeout(() => {
+        const card = Array.from(app.querySelectorAll("[data-card-id]")).find(
+          (entry) => entry.dataset.cardId === String(sharedItem.id),
+        );
+        card?.classList.add("shared-item");
+        card?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 80);
+    }
   }
 
   function renderFavorites() {
@@ -502,7 +913,7 @@
 
   function adminThumb(item) {
     if (item.demo) return `<div class="atlas-image atlas-${Number(item.atlasIndex) || 0}"></div>`;
-    return `<img src="${escapeHtml(safeHttpUrl(item.image_url))}" alt="" loading="lazy" />`;
+    return `<img src="${escapeHtml(safeHttpUrl(item.image_url))}" alt="" loading="lazy" decoding="async" />`;
   }
 
   function renderAdmin() {
@@ -606,6 +1017,7 @@
     updateAdminVisibility();
     updateAccountButton();
     refreshIcons();
+    translationManager.queue(app);
     // Preserve focus while search and card actions update their results.
   }
 
@@ -707,12 +1119,23 @@
       state.items = demoItems;
       return;
     }
-    const { data, error } = await supabaseClient
+    const columns =
+      "id,name,slug,description,category,image_url,texture_url,mcstructure_url,downloads,is_published,created_at,updated_at";
+    const legacyColumns =
+      "id,name,slug,description,category,image_url,texture_url,mcstructure_url,is_published,created_at,updated_at";
+    let query = supabaseClient
       .from("items")
-      .select("id,name,slug,description,category,image_url,texture_url,mcstructure_url,is_published,created_at,updated_at")
-      .order("created_at", { ascending: false });
-    if (error) throw error;
-    state.items = data || [];
+      .select(columns)
+      .order(state.sort === "downloads" ? "downloads" : "created_at", { ascending: false });
+    if (state.sort === "downloads") query = query.order("created_at", { ascending: false });
+
+    let result = await query;
+    const downloadsColumnMissing = result.error && /downloads/i.test(`${result.error.code} ${result.error.message}`);
+    if (downloadsColumnMissing) {
+      result = await supabaseClient.from("items").select(legacyColumns).order("created_at", { ascending: false });
+    }
+    if (result.error) throw result.error;
+    state.items = (result.data || []).map((item) => ({ ...item, downloads: itemDownloads(item) }));
   }
 
   async function loadUserData() {
@@ -810,6 +1233,89 @@
     });
   }
 
+  function updateDownloadCounters(item) {
+    const downloads = itemDownloads(item);
+    document.querySelectorAll("[data-download-count]").forEach((counter) => {
+      if (counter.dataset.downloadCount !== String(item.id)) return;
+      const number = counter.querySelector("strong");
+      const label = counter.querySelector("[data-download-label]");
+      if (number) number.textContent = formatDownloads(downloads);
+      if (label) label.textContent = downloadCountLabel(downloads);
+    });
+  }
+
+  async function incrementDownloadCount(item) {
+    if (!supabaseClient || !item || item.demo) return;
+    const previousDownloads = itemDownloads(item);
+    const optimisticDownloads = previousDownloads + 1;
+    item.downloads = optimisticDownloads;
+    updateDownloadCounters(item);
+
+    try {
+      const { data, error } = await supabaseClient.rpc("increment_item_download", {
+        target_item_id: item.id,
+      });
+      if (error) throw error;
+      const confirmedDownloads = Number(data);
+      if (!Number.isFinite(confirmedDownloads)) throw new Error("Contagem de downloads inválida.");
+      item.downloads = Math.max(itemDownloads(item), confirmedDownloads);
+      if (state.route === "home" && state.sort === "downloads") {
+        renderHome();
+        refreshIcons();
+      } else {
+        updateDownloadCounters(item);
+      }
+    } catch (error) {
+      if (itemDownloads(item) === optimisticDownloads) item.downloads = previousDownloads;
+      updateDownloadCounters(item);
+      console.error("Falha ao incrementar downloads:", error);
+    }
+  }
+
+  function itemShareUrl(item) {
+    const url = new URL(window.location.href);
+    url.hash = `/home?item=${encodeURIComponent(item.slug || item.id)}`;
+    return url.toString();
+  }
+
+  async function shareItem(item) {
+    if (!item) return;
+    const shareData = {
+      title: `${item.name} | HOLOLAB`,
+      text: item.description || "Confira esta estrutura de Minecraft no HOLOLAB.",
+      url: itemShareUrl(item),
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        return;
+      }
+      await navigator.clipboard.writeText(shareData.url);
+      showToast("Link copiado para compartilhar.", "success");
+    } catch (error) {
+      if (error.name !== "AbortError") {
+        console.error("Falha ao compartilhar:", error);
+        showToast("Não foi possível compartilhar este item.", "error");
+      }
+    }
+  }
+
+  async function changeCatalogSort(select) {
+    const nextSort = select.value === "downloads" ? "downloads" : "recent";
+    state.sort = nextSort;
+    select.disabled = true;
+    try {
+      await loadItems();
+      renderHome();
+      refreshIcons();
+    } catch (error) {
+      console.error("Falha ao ordenar catálogo:", error);
+      select.disabled = false;
+      showToast("Não foi possível ordenar as estruturas.", "error");
+    }
+  }
+
   async function handleAdminSubmit(event) {
     event.preventDefault();
     if (!supabaseClient || !isAdminUser()) return;
@@ -899,6 +1405,12 @@
       toggleFavorite(favorite.dataset.favoriteId);
       return;
     }
+    const share = event.target.closest("[data-share-id]");
+    if (share) {
+      const item = state.items.find((entry) => entry.id === share.dataset.shareId);
+      void shareItem(item);
+      return;
+    }
     const download = event.target.closest("[data-download-id]");
     if (download) {
       const item = state.items.find((entry) => entry.id === download.dataset.downloadId);
@@ -910,6 +1422,7 @@
         return;
       }
       recordDownload(item.id, format);
+      void incrementDownloadCount(item);
       showToast("Download direto iniciado.", "success");
       return;
     }
@@ -959,6 +1472,15 @@
   function attachEvents() {
     window.addEventListener("hashchange", renderRoute);
     app.addEventListener("click", handleAppClick);
+    const finishCardImageLoading = (event) => {
+      if (!(event.target instanceof HTMLImageElement) || !event.target.matches("[data-card-image]")) return;
+      event.target.closest(".card-media")?.classList.remove("is-image-loading");
+    };
+    app.addEventListener("load", finishCardImageLoading, true);
+    app.addEventListener("error", finishCardImageLoading, true);
+    app.addEventListener("change", (event) => {
+      if (event.target.matches("[data-catalog-sort]")) void changeCatalogSort(event.target);
+    });
     app.addEventListener("submit", (event) => {
       if (event.target.matches("#admin-form")) handleAdminSubmit(event);
     });
@@ -981,8 +1503,9 @@
       if (event.key === "Escape" && authDialog.open) authDialog.close();
     });
 
-    document.getElementById("language-select").addEventListener("change", (event) => {
-      document.documentElement.lang = event.target.value;
+    document.getElementById("language-select").addEventListener("change", async (event) => {
+      await translationManager.setLanguage(event.target.value);
+      renderRoute();
     });
 
     document.getElementById("account-button").addEventListener("click", () => {
@@ -1010,6 +1533,8 @@
     state.route = getRoute();
     applyLanguage();
     attachEvents();
+    translationManager.start();
+    void translationManager.setLanguage(translationManager.savedLocale());
     renderSkeleton();
     updateActiveNavigation();
     refreshIcons();

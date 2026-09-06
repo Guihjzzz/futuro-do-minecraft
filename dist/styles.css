@@ -616,6 +616,40 @@ svg {
   gap: 8px;
 }
 
+.catalog-controls {
+  display: flex;
+  min-width: min(100%, 520px);
+  align-items: flex-end;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sort-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.sort-control select {
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  outline: none;
+  background: var(--surface-raised);
+  padding: 0 34px 0 11px;
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+}
+
+.sort-control select:focus-visible {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(255, 39, 71, 0.13);
+}
+
 .filter-pill {
   display: inline-flex;
   min-height: 38px;
@@ -667,12 +701,32 @@ svg {
   transform: translateY(-4px);
 }
 
+.item-card.shared-item {
+  border-color: var(--red-bright);
+  box-shadow: 0 0 0 2px rgba(255, 39, 71, 0.16), var(--shadow-red);
+}
+
 .card-media {
   position: relative;
   aspect-ratio: 16 / 10;
   overflow: hidden;
   border-bottom: 1px solid var(--line);
   background: #111116;
+}
+
+.card-media.is-image-loading {
+  background: linear-gradient(100deg, #15151a 20%, #24242c 40%, #15151a 60%);
+  background-size: 220% 100%;
+  animation: card-image-shimmer 1.2s ease-in-out infinite;
+}
+
+.card-media.is-image-loading img {
+  opacity: 0;
+}
+
+@keyframes card-image-shimmer {
+  from { background-position-x: 110%; }
+  to { background-position-x: -110%; }
 }
 
 .card-media::after {
@@ -812,6 +866,53 @@ svg {
   display: grid;
   grid-template-columns: 1fr;
   gap: 8px;
+}
+
+.card-meta-actions {
+  display: flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.download-count,
+.share-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.download-count strong {
+  color: var(--text);
+}
+
+.download-count svg,
+.share-button svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  color: var(--red-bright);
+}
+
+.share-button {
+  min-height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.025);
+  padding: 0 10px;
+  cursor: pointer;
+  transition: 180ms ease;
+}
+
+.share-button:hover,
+.share-button:focus-visible {
+  border-color: rgba(255, 39, 71, 0.6);
+  outline: none;
+  color: #fff;
+  box-shadow: 0 0 15px rgba(255, 39, 71, 0.12);
 }
 
 .download-button {
@@ -1846,5 +1947,10 @@ svg {
   .global-search { min-width: 0; }
   .card-body p { display: block; }
   .topbar-actions { flex-shrink: 0; }
+  .catalog-controls { width: 100%; min-width: 0; align-items: flex-start; }
+  .sort-control { width: 100%; justify-content: space-between; }
+  .filters { width: 100%; }
+  .share-button { width: 36px; flex: 0 0 36px; justify-content: center; padding: 0; }
+  .share-button span { display: none; }
 }
 @media (max-width: 380px) { .mobile-brand { display: none; } }

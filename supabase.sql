@@ -39,6 +39,7 @@ create table if not exists public.items (
   download_url text check (download_url ~ '^https://'),
   texture_url text not null check (texture_url ~ '^https://'),
   mcstructure_url text not null check (mcstructure_url ~ '^https://'),
+  downloads bigint not null default 0,
   is_published boolean not null default true,
   created_by uuid references auth.users(id) on delete set null default auth.uid(),
   created_at timestamptz not null default now(),
@@ -52,6 +53,9 @@ alter table public.items add column if not exists image_url text;
 alter table public.items add column if not exists texture_url text;
 alter table public.items add column if not exists mcstructure_url text;
 alter table public.items add column if not exists download_url text;
+alter table public.items add column if not exists downloads bigint not null default 0;
+alter table public.items drop constraint if exists items_downloads_nonnegative;
+alter table public.items add constraint items_downloads_nonnegative check (downloads >= 0);
 update public.items set texture_url = download_url where texture_url is null and download_url is not null;
 update public.items set mcstructure_url = download_url where mcstructure_url is null and download_url is not null;
 alter table public.items alter column download_url drop not null;
@@ -133,6 +137,9 @@ create index if not exists download_history_user_created_idx
 
 create index if not exists items_published_created_idx
   on public.items (is_published, created_at desc);
+
+create index if not exists items_published_downloads_idx
+  on public.items (is_published, downloads desc, created_at desc);
 
 create or replace function public.set_updated_at()
 returns trigger
@@ -239,6 +246,34 @@ $$;
 
 revoke all on function public.is_admin() from public;
 grant execute on function public.is_admin() to anon, authenticated;
+
+-- Incremento atomico: o cliente pode somar um download, mas nunca definir o total.
+create or replace function public.increment_item_download(target_item_id uuid)
+returns bigint
+language plpgsql
+volatile
+security definer
+set search_path = ''
+as $$
+declare
+  updated_downloads bigint;
+begin
+  update public.items
+  set downloads = downloads + 1
+  where id = target_item_id
+    and is_published = true
+  returning downloads into updated_downloads;
+
+  if updated_downloads is null then
+    raise exception 'Item publicado nao encontrado';
+  end if;
+
+  return updated_downloads;
+end;
+$$;
+
+revoke all on function public.increment_item_download(uuid) from public;
+grant execute on function public.increment_item_download(uuid) to anon, authenticated;
 
 alter table public.profiles enable row level security;
 alter table public.items enable row level security;
