@@ -248,7 +248,9 @@ revoke all on function public.is_admin() from public;
 grant execute on function public.is_admin() to anon, authenticated;
 
 -- Incremento atomico: o cliente pode somar um download, mas nunca definir o total.
-create or replace function public.increment_item_download(target_item_id uuid)
+drop function if exists public.increment_item_download(uuid);
+
+create function public.increment_item_download(p_item_id uuid)
 returns bigint
 language plpgsql
 volatile
@@ -259,8 +261,8 @@ declare
   updated_downloads bigint;
 begin
   update public.items
-  set downloads = downloads + 1
-  where id = target_item_id
+  set downloads = coalesce(downloads, 0) + 1
+  where id = p_item_id
     and is_published = true
   returning downloads into updated_downloads;
 
@@ -274,6 +276,8 @@ $$;
 
 revoke all on function public.increment_item_download(uuid) from public;
 grant execute on function public.increment_item_download(uuid) to anon, authenticated;
+
+notify pgrst, 'reload schema';
 
 alter table public.profiles enable row level security;
 alter table public.items enable row level security;

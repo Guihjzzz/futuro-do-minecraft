@@ -1246,14 +1246,9 @@
 
   async function incrementDownloadCount(item) {
     if (!supabaseClient || !item || item.demo) return;
-    const previousDownloads = itemDownloads(item);
-    const optimisticDownloads = previousDownloads + 1;
-    item.downloads = optimisticDownloads;
-    updateDownloadCounters(item);
-
     try {
       const { data, error } = await supabaseClient.rpc("increment_item_download", {
-        target_item_id: item.id,
+        p_item_id: item.id,
       });
       if (error) throw error;
       const confirmedDownloads = Number(data);
@@ -1266,9 +1261,8 @@
         updateDownloadCounters(item);
       }
     } catch (error) {
-      if (itemDownloads(item) === optimisticDownloads) item.downloads = previousDownloads;
-      updateDownloadCounters(item);
       console.error("Falha ao incrementar downloads:", error);
+      showToast(error?.message || "Não foi possível atualizar o contador de downloads.", "error");
     }
   }
 
