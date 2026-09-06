@@ -2,10 +2,16 @@
   "use strict";
 
   const config = window.__APP_CONFIG__ || {};
+  const firebaseConfig = config.FIREBASE_CONFIG || {};
   const isConfigured =
     /^https:\/\/.+\.supabase\.co$/i.test(config.SUPABASE_URL || "") &&
     Boolean(config.SUPABASE_ANON_KEY) &&
     !String(config.SUPABASE_ANON_KEY).includes("SUA_SUPABASE");
+  const isFirebaseConfigured =
+    Boolean(firebaseConfig.apiKey) &&
+    Boolean(firebaseConfig.authDomain) &&
+    Boolean(firebaseConfig.projectId) &&
+    Boolean(firebaseConfig.appId);
 
   const ADMIN_EMAIL = "junindacosta00241@gmail.com";
   const CATEGORIES = ["Houses", "Decorations", "Farms", "Hologram Pack"];
@@ -42,9 +48,12 @@
     editingItemId: null,
     pendingDeleteId: null,
     authMode: "login",
+    authProvider: null,
   };
 
   let supabaseClient = null;
+  let firebaseSupabaseClient = null;
+  let firebaseAuthApi = null;
   const app = document.getElementById("app");
   const authDialog = document.getElementById("auth-dialog");
   const confirmDialog = document.getElementById("confirm-dialog");
@@ -80,9 +89,108 @@
 
   function isAdminUser() {
     return (
+      state.authProvider === "supabase" &&
       state.profile?.role === "admin" &&
       state.session?.user?.email?.trim().toLowerCase() === ADMIN_EMAIL
     );
+  }
+
+  function getDataClient() {
+    return state.authProvider === "firebase" ? firebaseSupabaseClient : supabaseClient;
+  }
+
+  function firebaseSession(user, accessToken) {
+    return {
+      access_token: accessToken,
+      provider: "firebase",
+      user: {
+        id: user.uid,
+        email: user.email,
+        user_metadata: { username: user.displayName || "" },
+      },
+    };
+  }
+
+  function firebaseAuthMessage(error) {
+    const messages = {
+      "auth/email-already-in-use": "Este e-mail já está em uso. Por favor, faça login ou use outro e-mail.",
+      "auth/invalid-credential": "E-mail ou senha incorretos.",
+      "auth/invalid-email": "Informe um e-mail válido.",
+      "auth/weak-password": "A senha precisa ter pelo menos 6 caracteres.",
+      "auth/too-many-requests": "Muitas tentativas. Aguarde um pouco e tente novamente.",
+    };
+    return messages[error?.code] || error?.message || String(error);
+  }
+
+  async function initializeFirebase() {
+    if (!isFirebaseConfigured) throw new Error("A configuração pública do Firebase está incompleta.");
+    const version = "12.18.0";
+    const [appSdk, authSdk] = await Promise.all([
+      import(`https://www.gstatic.com/firebasejs/${version}/firebase-app.js`),
+      import(`https://www.gstatic.com/firebasejs/${version}/firebase-auth.js`),
+    ]);
+    const firebaseApp = appSdk.getApps().length ? appSdk.getApp() : appSdk.initializeApp(firebaseConfig);
+    const auth = authSdk.getAuth(firebaseApp);
+    firebaseAuthApi = {
+      auth,
+      createUserWithEmailAndPassword: authSdk.createUserWithEmailAndPassword,
+      signInWithEmailAndPassword: authSdk.signInWithEmailAndPassword,
+      signOut: authSdk.signOut,
+      updateProfile: authSdk.updateProfile,
+      onAuthStateChanged: authSdk.onAuthStateChanged,
+    };
+  }
+
+  async function waitForInitialFirebaseUser() {
+    return new Promise((resolve, reject) => {
+      const unsubscribe = firebaseAuthApi.onAuthStateChanged(
+        firebaseAuthApi.auth,
+        (user) => {
+          unsubscribe();
+          resolve(user);
+        },
+        reject,
+      );
+    });
+  }
+
+  async function authorizeFirebaseUser(user) {
+    if (!user || user.email?.trim().toLowerCase() === ADMIN_EMAIL) {
+      throw new Error("A conta administrativa só pode entrar pelo Supabase.");
+    }
+    const currentToken = await user.getIdToken(false);
+    const response = await fetch("/api/set-role", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${currentToken}`,
+        "Content-Type": "application/json",
+      },
+      body: "{}",
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(result.error || "Não foi possível autorizar a conta no servidor.");
+    }
+    const tokenResult = await user.getIdTokenResult(true);
+    if (tokenResult.claims.role !== "authenticated") {
+      throw new Error("O token do Firebase ainda não recebeu a permissão do Supabase.");
+    }
+    return firebaseSession(user, tokenResult.token);
+  }
+
+  async function ensureFirebaseProfile(username = "") {
+    if (!firebaseSupabaseClient || state.authProvider !== "firebase" || !state.session?.user) return;
+    const id = state.session.user.id;
+    const { data, error } = await firebaseSupabaseClient.from("profiles").select("id").eq("id", id).maybeSingle();
+    if (error) throw error;
+    if (data) return;
+    const fallbackName = state.session.user.email?.split("@")[0] || "Player";
+    const result = await firebaseSupabaseClient.from("profiles").insert({
+      id,
+      username: (username || state.session.user.user_metadata?.username || fallbackName).slice(0, 60),
+      language: localeCode(),
+    });
+    if (result.error && result.error.code !== "23505") throw result.error;
   }
 
   function localeCode() {
@@ -514,8 +622,8 @@
   }
 
   function openAuthDialog(mode = "login") {
-    if (!isConfigured) {
-      showToast("Conecte o Supabase antes de usar contas.", "error");
+    if (!isConfigured || !firebaseAuthApi) {
+      showToast("A autenticação ainda não está disponível.", "error");
       return;
     }
     setAuthMode(mode);
@@ -536,27 +644,9 @@
     authDialog.querySelector(".auth-submit span").textContent = state.authMode === "signup" ? "Criar minha conta" : "Entrar";
   }
 
-  function authErrorMessage(error) {
-    const code = String(error?.code || "").toLowerCase();
-    const message = String(error?.message || "");
-    if (["user_already_exists", "email_exists"].includes(code) || /already.*registered|already.*exists/i.test(message)) {
-      return "Este e-mail já está em uso. Por favor, faça login ou use outro e-mail.";
-    }
-    if (code === "invalid_credentials" || /invalid login credentials/i.test(message)) {
-      return "E-mail ou senha incorretos.";
-    }
-    if (code === "weak_password" || /password.*(?:weak|short|characters)/i.test(message)) {
-      return "Escolha uma senha mais forte, com pelo menos 6 caracteres.";
-    }
-    if (code === "validation_failed" || /invalid.*email/i.test(message)) {
-      return "Informe um endereço de e-mail válido.";
-    }
-    return "Não foi possível entrar ou criar a conta. Verifique os dados e tente novamente.";
-  }
-
   async function handleAuthSubmit(event) {
     event.preventDefault();
-    if (!supabaseClient) return;
+    if (!supabaseClient || !firebaseAuthApi) return;
     const authForm = event.currentTarget;
     const submit = authForm.querySelector("button[type='submit']");
     const feedback = document.getElementById("auth-feedback");
@@ -568,41 +658,44 @@
     feedback.textContent = "Carregando...";
 
     try {
-      if (state.authMode === "signup") {
-        const { data, error } = await supabaseClient.auth.signUp({
-          email,
-          password,
-          options: { data: { username } },
-        });
-        if (error) throw error;
-        if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
-          const duplicateError = new Error("E-mail já cadastrado");
-          duplicateError.code = "email_exists";
-          throw duplicateError;
+      const normalizedEmail = email.toLowerCase();
+      if (normalizedEmail === ADMIN_EMAIL) {
+        if (state.authMode === "signup") {
+          throw new Error("A conta administrativa já deve existir no Supabase. Use a aba Entrar.");
         }
-        if (!data.session) throw new Error("Sessão não retornada pelo cadastro");
-
-        state.session = data.session;
-        authDialog.close();
-        authForm.reset();
-        updateAccountButton();
-        renderRoute();
-        await refreshSessionData(data.session);
-      } else {
         const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        if (!data.session) throw new Error("Sessão não retornada pelo login");
-
+        if (!data.session) throw new Error("Sessão administrativa não retornada pelo Supabase.");
+        if (data.session.user.email?.trim().toLowerCase() !== ADMIN_EMAIL) {
+          await supabaseClient.auth.signOut();
+          throw new Error("Conta sem permissão administrativa.");
+        }
+        if (firebaseAuthApi.auth.currentUser) await firebaseAuthApi.signOut(firebaseAuthApi.auth);
+        state.authProvider = "supabase";
         state.session = data.session;
-        authDialog.close();
-        authForm.reset();
-        updateAccountButton();
-        renderRoute();
-        await refreshSessionData(data.session);
+      } else {
+        const credential = state.authMode === "signup"
+          ? await firebaseAuthApi.createUserWithEmailAndPassword(firebaseAuthApi.auth, email, password)
+          : await firebaseAuthApi.signInWithEmailAndPassword(firebaseAuthApi.auth, email, password);
+        if (state.authMode === "signup" && username) {
+          await firebaseAuthApi.updateProfile(credential.user, { displayName: username });
+        }
+        const { data: supabaseAuth } = await supabaseClient.auth.getSession();
+        if (supabaseAuth.session) await supabaseClient.auth.signOut({ scope: "local" });
+        state.authProvider = "firebase";
+        state.session = await authorizeFirebaseUser(credential.user);
+        await ensureFirebaseProfile(username);
       }
+
+      authDialog.close();
+      authForm.reset();
+      await refreshSessionData(state.session);
     } catch (error) {
+      console.error("Erro de autenticação:", error);
+      const message = firebaseAuthMessage(error);
+      alert(message);
       feedback.classList.add("error");
-      feedback.textContent = authErrorMessage(error);
+      feedback.textContent = message;
       feedback.setAttribute("role", "alert");
     } finally {
       submit.disabled = false;
@@ -627,12 +720,13 @@
     state.favoriteIds = new Set();
     state.favoriteDates = new Map();
     state.downloads = [];
-    if (!supabaseClient || !state.session?.user) return;
+    const client = getDataClient();
+    if (!client || !state.session?.user) return;
 
     const [profileResult, favoritesResult, downloadsResult] = await Promise.all([
-      supabaseClient.from("profiles").select("id,username,role,created_at").eq("id", state.session.user.id).maybeSingle(),
-      supabaseClient.from("favorites").select("item_id,created_at").order("created_at", { ascending: false }),
-      supabaseClient
+      client.from("profiles").select("id,username,role,created_at").eq("id", state.session.user.id).maybeSingle(),
+      client.from("favorites").select("item_id,created_at").order("created_at", { ascending: false }),
+      client
         .from("download_history")
         .select("id,item_id,format,created_at,items(id,name,category,image_url,texture_url,mcstructure_url)")
         .order("created_at", { ascending: false })
@@ -665,7 +759,8 @@
   }
 
   async function toggleFavorite(itemId) {
-    if (!supabaseClient) {
+    const client = getDataClient();
+    if (!client) {
       showToast("Conecte o Supabase antes de usar contas.", "error");
       return;
     }
@@ -683,8 +778,8 @@
     renderRoute();
 
     const result = wasFavorite
-      ? await supabaseClient.from("favorites").delete().eq("user_id", state.session.user.id).eq("item_id", itemId)
-      : await supabaseClient.from("favorites").insert({ user_id: state.session.user.id, item_id: itemId });
+      ? await client.from("favorites").delete().eq("user_id", state.session.user.id).eq("item_id", itemId)
+      : await client.from("favorites").insert({ user_id: state.session.user.id, item_id: itemId });
 
     if (result.error) {
       if (wasFavorite) state.favoriteIds.add(itemId);
@@ -697,23 +792,15 @@
   }
 
   function recordDownload(itemId, format) {
-    if (!supabaseClient || !state.session || !isConfigured) return;
-    const body = JSON.stringify({
+    const client = getDataClient();
+    if (!client || !state.session || !isConfigured) return;
+    client.from("download_history").insert({
       user_id: state.session.user.id,
       item_id: itemId,
       format,
+    }).then(({ error }) => {
+      if (error) console.error("Falha ao registrar download:", error);
     });
-    fetch(`${config.SUPABASE_URL}/rest/v1/download_history`, {
-      method: "POST",
-      keepalive: true,
-      headers: {
-        apikey: config.SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${state.session.access_token}`,
-        "Content-Type": "application/json",
-        Prefer: "return=minimal",
-      },
-      body,
-    }).catch(() => {});
     state.downloads.unshift({
       id: `pending-${Date.now()}`,
       item_id: itemId,
@@ -791,8 +878,13 @@
   }
 
   async function signOut() {
-    if (!supabaseClient) return;
-    await supabaseClient.auth.signOut();
+    if (state.authProvider === "firebase" && firebaseAuthApi) {
+      await firebaseAuthApi.signOut(firebaseAuthApi.auth);
+    } else if (supabaseClient) {
+      await supabaseClient.auth.signOut();
+    }
+    state.authProvider = null;
+    await refreshSessionData(null);
     window.location.hash = "#/home";
   }
 
@@ -930,11 +1022,89 @@
           detectSessionInUrl: true,
         },
       });
-      const { data } = await supabaseClient.auth.getSession();
-      state.session = data.session;
+      try {
+        await initializeFirebase();
+        firebaseSupabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY, {
+          accessToken: async () => firebaseAuthApi.auth.currentUser?.getIdToken(false) ?? null,
+          auth: {
+            persistSession: false,
+            autoRefreshToken: false,
+            detectSessionInUrl: false,
+          },
+        });
+      } catch (error) {
+        console.error("Falha ao iniciar o Firebase:", error);
+        showToast(error?.message || "Não foi possível iniciar a autenticação.", "error");
+      }
+
+      const [{ data }, firebaseUser] = await Promise.all([
+        supabaseClient.auth.getSession(),
+        firebaseAuthApi ? waitForInitialFirebaseUser() : Promise.resolve(null),
+      ]);
+      const supabaseSession = data.session;
+      const hasAdminSession = supabaseSession?.user?.email?.trim().toLowerCase() === ADMIN_EMAIL;
+
+      if (hasAdminSession) {
+        state.authProvider = "supabase";
+        state.session = supabaseSession;
+      } else if (firebaseUser) {
+        try {
+          state.authProvider = "firebase";
+          state.session = await authorizeFirebaseUser(firebaseUser);
+          await ensureFirebaseProfile();
+        } catch (error) {
+          console.error("Falha ao autorizar a sessão Firebase no Supabase:", error);
+          state.authProvider = null;
+          state.session = null;
+          showToast(error?.message || "Não foi possível sincronizar sua conta.", "error");
+        }
+      } else if (supabaseSession) {
+        // Mantém sessões antigas do Supabase funcionando durante a migração.
+        state.authProvider = "supabase";
+        state.session = supabaseSession;
+      }
+
       supabaseClient.auth.onAuthStateChange((_event, session) => {
-        window.setTimeout(() => refreshSessionData(session), 0);
+        window.setTimeout(() => {
+          const isAdminSession = session?.user?.email?.trim().toLowerCase() === ADMIN_EMAIL;
+          if (isAdminSession || state.authProvider !== "firebase") {
+            state.authProvider = session ? "supabase" : null;
+            void refreshSessionData(session);
+          }
+        }, 0);
       });
+
+      if (firebaseAuthApi) {
+        let initialFirebaseEvent = true;
+        firebaseAuthApi.onAuthStateChanged(firebaseAuthApi.auth, (user) => {
+          if (initialFirebaseEvent) {
+            initialFirebaseEvent = false;
+            return;
+          }
+          window.setTimeout(async () => {
+            const { data: currentSupabaseAuth } = await supabaseClient.auth.getSession();
+            const adminIsActive = currentSupabaseAuth.session?.user?.email?.trim().toLowerCase() === ADMIN_EMAIL;
+            if (adminIsActive) return;
+            if (!user) {
+              if (state.authProvider === "firebase") {
+                state.authProvider = null;
+                await refreshSessionData(null);
+              }
+              return;
+            }
+            try {
+              state.authProvider = "firebase";
+              const session = await authorizeFirebaseUser(user);
+              state.session = session;
+              await ensureFirebaseProfile();
+              await refreshSessionData(session);
+            } catch (error) {
+              console.error("Falha ao atualizar a sessão Firebase:", error);
+              showToast(error?.message || "Não foi possível sincronizar sua conta.", "error");
+            }
+          }, 0);
+        });
+      }
     }
 
     try {

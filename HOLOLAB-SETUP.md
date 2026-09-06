@@ -1,17 +1,26 @@
-# Guizz HOLOLAB — atualização da base existente
+# Guizz HOLOLAB — autenticação híbrida
 
-Os arquivos completos modificados estão em dist/index.html, dist/app.js e dist/styles.css. Nenhuma dependência foi adicionada. A conexão pública existente em dist/config.js foi preservada; não há senha nem service_role no frontend.
+O administrador continua no Supabase Auth. Contas comuns usam Firebase Auth e apresentam o JWT do Firebase à API do Supabase para acessar favoritos, histórico e perfil sob RLS. Não há senha nem chave `service_role` no frontend.
 
 ## Supabase
 
-1. Faça um backup do banco e execute o arquivo supabase.sql completo no SQL Editor. O script é transacional e preserva os links antigos copiando download_url para texture_url e mcstructure_url. A coluna antiga permanece apenas para compatibilidade. Se registros antigos não tiverem link, a transação falha sem aplicar parcialmente: corrija esses registros e execute novamente.
-2. Em Authentication → Providers → Email (ou Sign In / Providers → Email), mantenha Confirm email desativado para que um cadastro válido já retorne uma sessão. O frontend aplica essa sessão e fecha o modal imediatamente.
-3. Não altere a role padrão: novos perfis recebem user pelo trigger. A conta admin existente deve manter role admin. O frontend exige o e-mail administrativo e a role; a função RLS também verifica o e-mail atual e confirmado em auth.users.
-4. Recarregue o site. No admin, informe nome, categoria, descrição, URL de imagem, link da Textura e link do Mcstructure. Use URLs HTTPS finais.
+1. Faça backup e execute `supabase.sql` inteiro no SQL Editor.
+2. Em **Authentication → Third-Party Auth**, adicione Firebase com o Project ID `ghuizz-hololab`.
+3. Mantenha a conta admin em Supabase Auth, confirmada e com `role = 'admin'` em `profiles`.
 
-## Cadastro duplicado
+## Firebase e Vercel Function
 
-O Supabase impede contas duplicadas. A interface converte os erros user_already_exists/email_exists e identifica a resposta com identities vazias para exibir um alerta amigável. Não há consulta pública à lista de e-mails.
+1. Em Firebase Console → Authentication → Sign-in method, ative Email/Password.
+2. Em Authentication → Settings → Authorized domains, adicione o domínio da Vercel.
+3. Gere uma chave em Firebase → Configurações do projeto → Contas de serviço → Gerar nova chave privada.
+4. Na Vercel → Project → Settings → Environment Variables, cadastre `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL` e `FIREBASE_PRIVATE_KEY` com os valores do JSON.
+5. Faça um novo deployment na Vercel.
+
+A rota `api/set-role.mjs` usa o Admin SDK para validar o ID token e atribuir somente `role: authenticated`. Ela remove qualquer claim `admin` de contas comuns; o administrador continua validado pelo usuário real do Supabase, perfil e e-mail confirmado. O JSON privado nunca deve ser enviado ao GitHub.
+
+## Cadastro e sessão
+
+O Firebase impede contas duplicadas. Após cadastro ou login, o frontend força a renovação do ID token e usa esse JWT no cliente de dados do Supabase. A conta administrativa é recusada no Firebase e entra somente pelo Supabase.
 
 ## Idioma do navegador
 

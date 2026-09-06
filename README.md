@@ -1,14 +1,16 @@
 # Guizz HOLOLAB
 
-Marketplace estático e responsivo para texturas e estruturas de Minecraft. O frontend usa o SDK oficial do Supabase para autenticação e banco de dados. Cada card oferece downloads diretos e independentes de **Textura** e **Mcstructure**, sem contador ou página intermediária.
+Marketplace estático e responsivo para texturas e estruturas de Minecraft. O admin usa Supabase Auth; usuários comuns usam Firebase Auth com Third-Party Auth do Supabase. Favoritos, histórico, perfis, itens e RLS permanecem no Supabase.
 
 ## Arquivos principais
 
-- `dist/index.html`: estrutura da interface, marca HOLOLAB, navegação e redes sociais.
+- `index.html`: entrada do site na raiz para a Vercel.
 - `dist/styles.css`: dark mode responsivo com detalhes em vermelho neon.
 - `dist/app.js`: catálogo, filtros, seletor de idioma nativo, autenticação, favoritos, histórico e painel admin.
-- `dist/config.js`: Project URL e chave pública anon/publishable do Supabase.
+- `dist/config.js`: configurações públicas do Supabase e Firebase.
 - `supabase.sql`: tabelas, migração, funções, permissões e políticas RLS.
+- `api/set-role.mjs`: Vercel Function que valida o token e atribui o claim `role: authenticated`.
+- `package.json`: dependência de servidor `firebase-admin` usada pela Vercel.
 - `HOLOLAB-SETUP.md`: roteiro curto de configuração e publicação.
 
 ## Preparar o Supabase
@@ -31,7 +33,7 @@ Itens antigos que usavam `download_url` têm esse valor copiado para `texture_ur
 update public.profiles
 set role = 'admin'
 where id = (
-  select id
+  select id::text
   from auth.users
   where email = 'junindacosta00241@gmail.com'
 );
@@ -47,14 +49,22 @@ Preencha `dist/config.js` somente com valores públicos:
 window.__APP_CONFIG__ = {
   SUPABASE_URL: "https://SEU-ID.supabase.co",
   SUPABASE_ANON_KEY: "SUA_CHAVE_PUBLICA_ANON",
+  FIREBASE_CONFIG: {
+    apiKey: "SUA_FIREBASE_WEB_API_KEY",
+    authDomain: "SEU-PROJETO.firebaseapp.com",
+    projectId: "SEU-PROJETO",
+    storageBucket: "SEU-PROJETO.firebasestorage.app",
+    messagingSenderId: "SEU_SENDER_ID",
+    appId: "SEU_APP_ID",
+  },
 };
 ```
 
 Nunca coloque a chave `service_role` no navegador. A proteção real das operações vem das políticas RLS.
 
-## Auth instantâneo e e-mail duplicado
+## Auth híbrido
 
-Em **Authentication > Providers > Email**, mantenha Email habilitado e **Confirm email** desativado. O cadastro usa a sessão retornada por `supabase.auth.signUp()` imediatamente, fecha o modal e atualiza a interface para o estado autenticado.
+Ative Email/Password no Firebase, autorize o domínio publicado e registre o projeto `ghuizz-hololab` em **Supabase → Authentication → Third-Party Auth**. Configure `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL` e `FIREBASE_PRIVATE_KEY` nas variáveis de ambiente da Vercel; a rota `/api/set-role` usa esses segredos somente no servidor.
 
 O seletor PT/EN/ES não mantém traduções no JavaScript: ele altera somente o atributo `lang` do documento para integração com os recursos nativos do navegador.
 
@@ -62,7 +72,7 @@ Em **Authentication > URL Configuration**, configure a **Site URL** com o domín
 
 ## Publicar itens
 
-Sirva a pasta `dist` em uma hospedagem estática. No painel admin, informe:
+Publique a raiz do repositório na Vercel. No painel admin, informe:
 
 - nome e descrição;
 - uma das quatro categorias: `Houses`, `Decorations`, `Farms` ou `Hologram Pack`;
